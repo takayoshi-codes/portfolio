@@ -159,15 +159,14 @@
 
     /* WORKS */
     .works-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      display: grid; grid-template-columns: repeat(2, 1fr);
       gap: 1px; background: var(--border);
     }
     .work-item {
       position: relative; aspect-ratio: 4/3;
       overflow: hidden; cursor: pointer; background: var(--tag-bg);
     }
-    .work-item:first-child { grid-column: span 2; aspect-ratio: 16/9; }
-    @media (max-width: 600px) { .work-item:first-child { grid-column: span 1; aspect-ratio: 4/3; } }
+    @media (max-width: 600px) { .works-grid { grid-template-columns: 1fr; } }
     .work-thumb { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
     .work-placeholder {
       width: 100%; height: 100%;
@@ -397,57 +396,145 @@
       <span class="section-title">Works</span>
     </div>
     <div class="works-grid">
-      <div class="work-item" data-url="/works/task-manager/" data-title="タスク管理ツール">
+
+      <!-- 1: 在庫・発注管理 (span 2) -->
+      <div class="work-item" data-url="works/inventory.html" data-title="在庫・発注管理 Web アプリ">
         <canvas class="work-canvas" id="wc1" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
         <div class="work-overlay">
           <div class="work-tag">Web App</div>
-          <div class="work-title">タスク管理ツール</div>
+          <div class="work-title">在庫・発注管理 Web アプリ</div>
           <div class="work-techs">
-            <span class="work-tech">Next.js</span>
-            <span class="work-tech">Supabase</span>
-            <span class="work-tech">Tailwind</span>
+            <span class="work-tech">Django</span>
+            <span class="work-tech">PostgreSQL</span>
+            <span class="work-tech">Railway</span>
           </div>
-          <div class="work-open-hint">▶ クリックして試す</div>
+          <div class="work-open-hint">準備中</div>
         </div>
       </div>
-      <div class="work-item" data-url="/works/ai-minutes/" data-title="議事録 AI">
+
+      <!-- 2: マルチ資産予測 -->
+      <div class="work-item" data-url="works/market-predictor.html" data-title="マルチ資産リアルタイム予測ダッシュボード">
         <canvas class="work-canvas" id="wc2" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
         <div class="work-overlay">
-          <div class="work-tag">AI Tool</div>
-          <div class="work-title">議事録 AI</div>
+          <div class="work-tag">ML / Dashboard</div>
+          <div class="work-title">マルチ資産リアルタイム予測</div>
           <div class="work-techs">
-            <span class="work-tech">React</span>
-            <span class="work-tech">Claude API</span>
-            <span class="work-tech">Python</span>
+            <span class="work-tech">LSTM</span>
+            <span class="work-tech">scikit-learn</span>
+            <span class="work-tech">Streamlit</span>
           </div>
-          <div class="work-open-hint">▶ クリックして試す</div>
+          <div class="work-open-hint">準備中</div>
         </div>
       </div>
-      <div class="work-item" data-url="" data-title="売上分析ダッシュボード">
+
+      <!-- 3: 商品画像分類 -->
+      <div class="work-item" data-url="works/image-classifier.html" data-title="商品画像 自動分類アプリ">
         <canvas class="work-canvas" id="wc3" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
         <div class="work-overlay">
-          <div class="work-tag">Dashboard</div>
-          <div class="work-title">売上分析ダッシュボード</div>
+          <div class="work-tag">Deep Learning</div>
+          <div class="work-title">商品画像 自動分類アプリ</div>
           <div class="work-techs">
-            <span class="work-tech">Vue 3</span>
-            <span class="work-tech">FastAPI</span>
-            <span class="work-tech">PostgreSQL</span>
+            <span class="work-tech">CNN</span>
+            <span class="work-tech">VGG16</span>
+            <span class="work-tech">Django</span>
           </div>
           <div class="work-open-hint">準備中</div>
         </div>
       </div>
-      <div class="work-item" data-url="" data-title="作品タイトル4">
+
+      <!-- 4: 植物診断 -->
+      <div class="work-item" data-url="works/plant-care.html" data-title="植物診断＆ケアアドバイスアプリ">
         <canvas class="work-canvas" id="wc4" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
         <div class="work-overlay">
-          <div class="work-tag">Web App</div>
-          <div class="work-title">作品タイトル4</div>
+          <div class="work-tag">AI × Web</div>
+          <div class="work-title">植物診断＆ケアアドバイス</div>
           <div class="work-techs">
-            <span class="work-tech">技術1</span>
-            <span class="work-tech">技術2</span>
+            <span class="work-tech">VGG16</span>
+            <span class="work-tech">BERT</span>
+            <span class="work-tech">Django</span>
+            <span class="work-tech">Slack</span>
           </div>
           <div class="work-open-hint">準備中</div>
         </div>
       </div>
+
+      <!-- 5: 複合感情分析 -->
+      <div class="work-item" data-url="works/emotion-analyzer.html" data-title="マルチモーダル複合感情・ストレス分析ツール">
+        <canvas class="work-canvas" id="wc5" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
+        <div class="work-overlay">
+          <div class="work-tag">NLP × Audio × Vision</div>
+          <div class="work-title">複合感情・ストレス分析</div>
+          <div class="work-techs">
+            <span class="work-tech">BERT</span>
+            <span class="work-tech">librosa</span>
+            <span class="work-tech">OpenCV</span>
+            <span class="work-tech">Streamlit</span>
+          </div>
+          <div class="work-open-hint">準備中</div>
+        </div>
+      </div>
+
+      <!-- 6: ニュース要約 -->
+      <div class="work-item" data-url="works/news-summarizer.html" data-title="ニュース自動要約＆トレンド検出ダッシュボード">
+        <canvas class="work-canvas" id="wc6" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
+        <div class="work-overlay">
+          <div class="work-tag">NLP</div>
+          <div class="work-title">ニュース自動要約＆トレンド検出</div>
+          <div class="work-techs">
+            <span class="work-tech">GPT-2</span>
+            <span class="work-tech">BERT</span>
+            <span class="work-tech">Streamlit</span>
+          </div>
+          <div class="work-open-hint">準備中</div>
+        </div>
+      </div>
+
+      <!-- 7: 求人マッチング -->
+      <div class="work-item" data-url="works/job-matcher.html" data-title="求人票×職務経歴書 マッチング診断ツール">
+        <canvas class="work-canvas" id="wc7" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
+        <div class="work-overlay">
+          <div class="work-tag">NLP</div>
+          <div class="work-title">求人票×職務経歴書 マッチング診断</div>
+          <div class="work-techs">
+            <span class="work-tech">Word2Vec</span>
+            <span class="work-tech">BERT</span>
+            <span class="work-tech">Streamlit</span>
+          </div>
+          <div class="work-open-hint">準備中</div>
+        </div>
+      </div>
+
+      <!-- 8: 競合価格Bot -->
+      <div class="work-item" data-url="works/price-monitor.html" data-title="競合価格モニタリング＆通知Bot">
+        <canvas class="work-canvas" id="wc8" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
+        <div class="work-overlay">
+          <div class="work-tag">Business Automation</div>
+          <div class="work-title">競合価格モニタリング＆通知Bot</div>
+          <div class="work-techs">
+            <span class="work-tech">Scraping</span>
+            <span class="work-tech">Slack API</span>
+            <span class="work-tech">Gmail API</span>
+            <span class="work-tech">GitHub Actions</span>
+          </div>
+          <div class="work-open-hint">準備中</div>
+        </div>
+      </div>
+
+      <!-- 9: 週次レポート -->
+      <div class="work-item" data-url="works/report-generator.html" data-title="週次レポート自動生成ツール">
+        <canvas class="work-canvas" id="wc9" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
+        <div class="work-overlay">
+          <div class="work-tag">Business Automation</div>
+          <div class="work-title">週次レポート自動生成ツール</div>
+          <div class="work-techs">
+            <span class="work-tech">pandas</span>
+            <span class="work-tech">openpyxl</span>
+            <span class="work-tech">Streamlit</span>
+          </div>
+          <div class="work-open-hint">準備中</div>
+        </div>
+      </div>
+
     </div>
   </section>
 
@@ -468,12 +555,25 @@
           <div class="skill-bar-bg"><div class="skill-bar" data-w="85" style="--delay:0.2s"></div></div>
         </div>
         <div class="skill-row">
-          <div class="skill-meta"><span class="skill-name">Python / FastAPI</span><span class="skill-pct">75%</span></div>
-          <div class="skill-bar-bg"><div class="skill-bar" data-w="75" style="--delay:0.3s"></div></div>
+          <div class="skill-meta"><span class="skill-name">Python / Django</span><span class="skill-pct">80%</span></div>
+          <div class="skill-bar-bg"><div class="skill-bar" data-w="80" style="--delay:0.3s"></div></div>
         </div>
         <div class="skill-row">
           <div class="skill-meta"><span class="skill-name">Vue 3</span><span class="skill-pct">70%</span></div>
           <div class="skill-bar-bg"><div class="skill-bar" data-w="70" style="--delay:0.4s"></div></div>
+        </div>
+        <div class="skills-group-title" style="margin-top:2rem;">AI / ML / NLP</div>
+        <div class="skill-row">
+          <div class="skill-meta"><span class="skill-name">Machine Learning（scikit-learn）</span><span class="skill-pct">75%</span></div>
+          <div class="skill-bar-bg"><div class="skill-bar" data-w="75" style="--delay:0.5s"></div></div>
+        </div>
+        <div class="skill-row">
+          <div class="skill-meta"><span class="skill-name">Deep Learning（Keras / TensorFlow）</span><span class="skill-pct">70%</span></div>
+          <div class="skill-bar-bg"><div class="skill-bar" data-w="70" style="--delay:0.6s"></div></div>
+        </div>
+        <div class="skill-row">
+          <div class="skill-meta"><span class="skill-name">NLP（BERT / Word2Vec / MeCab）</span><span class="skill-pct">65%</span></div>
+          <div class="skill-bar-bg"><div class="skill-bar" data-w="65" style="--delay:0.7s"></div></div>
         </div>
       </div>
       <div>
@@ -483,12 +583,40 @@
           <span class="tag-pill">Docker</span>
           <span class="tag-pill">AWS</span>
           <span class="tag-pill">Vercel</span>
-          <span class="tag-pill">Supabase</span>
+          <span class="tag-pill">Railway</span>
           <span class="tag-pill">PostgreSQL</span>
           <span class="tag-pill">GitHub Actions</span>
-          <span class="tag-pill">Tailwind CSS</span>
+          <span class="tag-pill">Streamlit</span>
+          <span class="tag-pill">OpenCV</span>
+          <span class="tag-pill">librosa</span>
+          <span class="tag-pill">HuggingFace</span>
+          <span class="tag-pill">Slack API</span>
+          <span class="tag-pill">Gmail API</span>
+          <span class="tag-pill">openpyxl</span>
           <span class="tag-pill">OpenAI API</span>
           <span class="tag-pill">Claude API</span>
+        </div>
+        <div style="margin-top:2rem;">
+          <div class="skills-group-title">Full Stack List</div>
+          <a href="stack.html" target="_blank" rel="noopener" style="
+            display:inline-flex; align-items:center; gap:8px;
+            font-size:11px; letter-spacing:0.08em; text-transform:uppercase;
+            color:var(--tag-color); background:var(--tag-bg);
+            padding:8px 16px; border-radius:1px; text-decoration:none;
+            border:0.5px solid var(--border-md); transition:background 0.2s, color 0.2s;
+          " onmouseover="this.style.color='var(--text)';this.style.background='var(--bg-white)'"
+             onmouseout="this.style.color='var(--tag-color)';this.style.background='var(--tag-bg)'">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="opacity:0.6">
+              <rect x="0.5" y="0.5" width="4.5" height="4.5" rx="1" stroke="currentColor" stroke-width="0.8"/>
+              <rect x="7" y="0.5" width="4.5" height="4.5" rx="1" stroke="currentColor" stroke-width="0.8"/>
+              <rect x="0.5" y="7" width="4.5" height="4.5" rx="1" stroke="currentColor" stroke-width="0.8"/>
+              <rect x="7" y="7" width="4.5" height="4.5" rx="1" stroke="currentColor" stroke-width="0.8"/>
+            </svg>
+            View All Tech Stack →
+          </a>
+          <p style="font-size:11px;color:var(--text-muted);margin-top:8px;line-height:1.8;">
+            使用技術の全一覧を StackShare 風にまとめています。
+          </p>
         </div>
       </div>
     </div>
@@ -508,7 +636,7 @@
         </p>
       </div>
       <div class="contact-action">
-        <a class="btn btn-primary" href="mailto:your@email.com">お問い合わせ →</a>
+        <a class="btn btn-primary" href="/cdn-cgi/l/email-protection#e891879d9aa88d85898184c68b8785">お問い合わせ →</a>
         <p class="contact-note">
           返信は通常 1〜2 営業日以内にお送りします。<br>
           案件の規模・予算問わずお気軽にどうぞ。
@@ -551,7 +679,7 @@
     </div>
   </div>
 
-  <script>
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
     /* ── HERO CANVAS (starfield) ── */
     (function () {
       const wrap   = document.getElementById('heroWrap');
@@ -869,9 +997,136 @@
       });
       [0.62,0.42,0.72,0.34,0.54].forEach((lw,i)=>{
         ctx.fillStyle='rgba(28,28,26,0.1)';
-        ctx.fillRect(cx-cw/2+10, cy-ch/2+26+i*14, cw*0.8*lw, 4);
+        ctx.fillRect(w*0.08+i*32, h*0.82, lw*w*0.18, 3);
       });
     });
+
+    // 5: 複合感情分析 — レーダーチャート風
+    drawWorkCanvas('wc5', (ctx, w, h) => {
+      ctx.fillStyle = '#f4f2ee'; ctx.fillRect(0,0,w,h);
+      const cx=w/2, cy=h/2, r=Math.min(w,h)*0.32;
+      const pts=6;
+      for(let ring=1;ring<=3;ring++){
+        ctx.beginPath();
+        for(let i=0;i<pts;i++){
+          const a=i*(Math.PI*2/pts)-Math.PI/2;
+          const x=cx+Math.cos(a)*r*(ring/3), y=cy+Math.sin(a)*r*(ring/3);
+          i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+        }
+        ctx.closePath();
+        ctx.strokeStyle=`rgba(28,28,26,${0.06+ring*0.04})`; ctx.lineWidth=0.5; ctx.stroke();
+      }
+      const vals=[0.82,0.65,0.78,0.55,0.9,0.7];
+      ctx.beginPath();
+      vals.forEach((v,i)=>{
+        const a=i*(Math.PI*2/pts)-Math.PI/2;
+        const x=cx+Math.cos(a)*r*v, y=cy+Math.sin(a)*r*v;
+        i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+      });
+      ctx.closePath();
+      ctx.fillStyle='rgba(28,28,26,0.08)'; ctx.fill();
+      ctx.strokeStyle='rgba(28,28,26,0.4)'; ctx.lineWidth=1; ctx.stroke();
+      vals.forEach((v,i)=>{
+        const a=i*(Math.PI*2/pts)-Math.PI/2;
+        ctx.beginPath(); ctx.arc(cx+Math.cos(a)*r*v, cy+Math.sin(a)*r*v, 2.5,0,Math.PI*2);
+        ctx.fillStyle='#1c1c1a'; ctx.fill();
+      });
+    });
+
+    // 6: ニュース要約 — テキストフィード風
+    drawWorkCanvas('wc6', (ctx, w, h) => {
+      ctx.fillStyle = '#f8f7f4'; ctx.fillRect(0,0,w,h);
+      const rows=[{w:0.55,tag:true},{w:0.72},{w:0.48},{w:0.62,tag:true},{w:0.8},{w:0.38}];
+      rows.forEach((r,i)=>{
+        const y=18+i*22;
+        if(r.tag){
+          ctx.fillStyle='rgba(28,28,26,0.12)'; ctx.fillRect(w*0.06, y, 28, 8);
+        }
+        ctx.fillStyle='rgba(28,28,26,0.15)';
+        ctx.fillRect(w*0.06+(r.tag?34:0), y, w*r.w, 8);
+        ctx.fillStyle='rgba(28,28,26,0.07)';
+        ctx.fillRect(w*0.06+(r.tag?34:0), y+11, w*r.w*0.6, 5);
+        if(i<rows.length-1){
+          ctx.beginPath(); ctx.moveTo(w*0.06,y+19); ctx.lineTo(w*0.94,y+19);
+          ctx.strokeStyle='rgba(28,28,26,0.06)'; ctx.lineWidth=0.5; ctx.stroke();
+        }
+      });
+    });
+
+    // 7: 求人マッチング — スコアゲージ
+    drawWorkCanvas('wc7', (ctx, w, h) => {
+      ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,w,h);
+      const cx=w/2, cy=h*0.5, radius=Math.min(w,h)*0.3;
+      ctx.beginPath(); ctx.arc(cx,cy,radius,Math.PI,2*Math.PI);
+      ctx.strokeStyle='rgba(28,28,26,0.1)'; ctx.lineWidth=8; ctx.stroke();
+      ctx.beginPath(); ctx.arc(cx,cy,radius,Math.PI,Math.PI+Math.PI*0.76);
+      ctx.strokeStyle='rgba(28,28,26,0.7)'; ctx.lineWidth=8;
+      ctx.lineCap='round'; ctx.stroke();
+      ctx.fillStyle='rgba(28,28,26,0.8)'; ctx.font='700 18px monospace';
+      ctx.textAlign='center'; ctx.fillText('76%', cx, cy+6);
+      ctx.fillStyle='rgba(28,28,26,0.35)'; ctx.font='500 7px monospace';
+      ctx.fillText('MATCH SCORE', cx, cy+18); ctx.textAlign='start';
+      [0.52,0.38,0.66].forEach((lw,i)=>{
+        ctx.fillStyle='rgba(28,28,26,0.08)';
+        ctx.fillRect(w*0.1, h*0.78+i*10, w*lw, 5);
+      });
+    });
+
+    // 8: 競合価格Bot — 折れ線＋通知バッジ
+    drawWorkCanvas('wc8', (ctx, w, h) => {
+      ctx.fillStyle = '#f0ede6'; ctx.fillRect(0,0,w,h);
+      const data=[0.5,0.48,0.52,0.47,0.6,0.55,0.58,0.72,0.65,0.7];
+      const bw3=(w*0.8)/data.length;
+      ctx.beginPath();
+      data.forEach((v,i)=>{
+        const x=w*0.1+i*bw3+bw3*0.5, y=h*0.75-v*h*0.5;
+        i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+      });
+      ctx.strokeStyle='rgba(28,28,26,0.5)'; ctx.lineWidth=1.5; ctx.lineJoin='round'; ctx.stroke();
+      data.forEach((v,i)=>{
+        const x=w*0.1+i*bw3+bw3*0.5, y=h*0.75-v*h*0.5;
+        ctx.beginPath(); ctx.arc(x,y,2,0,Math.PI*2);
+        ctx.fillStyle=i===7?'#1c1c1a':'rgba(28,28,26,0.3)'; ctx.fill();
+      });
+      ctx.fillStyle='rgba(28,28,26,0.85)'; ctx.fillRect(w*0.6,h*0.08,w*0.32,22);
+      ctx.fillStyle='rgba(255,255,255,0.9)'; ctx.font='600 7px monospace';
+      ctx.fillText('⚡ PRICE ALERT', w*0.62, h*0.08+14);
+    });
+
+    // 9: 週次レポート — Excelグリッド風
+    drawWorkCanvas('wc9', (ctx, w, h) => {
+      ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,w,h);
+      const cols=5, rows2=6, cw3=w*0.84/cols, rh=h*0.78/rows2;
+      const ox=w*0.08, oy=h*0.1;
+      ctx.fillStyle='rgba(28,28,26,0.05)';
+      ctx.fillRect(ox,oy,w*0.84,rh);
+      for(let c=0;c<cols;c++) for(let r=0;r<rows2;r++){
+        ctx.strokeStyle='rgba(28,28,26,0.07)'; ctx.lineWidth=0.5;
+        ctx.strokeRect(ox+c*cw3, oy+r*rh, cw3, rh);
+        if(r>0&&c>0){
+          const v=0.2+Math.random()*0.6;
+          ctx.fillStyle=r===rows2-1?'rgba(28,28,26,0.18)':'rgba(28,28,26,0.08)';
+          ctx.fillRect(ox+c*cw3+4, oy+r*rh+rh/2-3, cw3*v*0.8, 5);
+        }
+      }
+      ctx.fillStyle='rgba(40,160,80,0.15)';
+      ctx.fillRect(ox+cw3*2, oy+rh*2, cw3, rh*4);
+      ctx.strokeStyle='rgba(40,160,80,0.4)'; ctx.lineWidth=0.5;
+      ctx.strokeRect(ox+cw3*2, oy+rh*2, cw3, rh*4);
+    });
+
+    /* ── SKILL BARS ── */
+    const skillObs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.querySelectorAll('.skill-bar').forEach(bar => {
+            bar.style.width = bar.dataset.w + '%';
+          });
+        }
+      });
+    }, { threshold: 0.2 });
+    document.querySelectorAll('#skills').forEach(s => skillObs.observe(s));
+
   </script>
 </body>
 </html>
