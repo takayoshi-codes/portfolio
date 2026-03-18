@@ -794,11 +794,16 @@
         };
       }
 
-      // 15秒ごとに登場（最初は5秒後）
+      // 15秒ごとに登場（最初は5秒後）・重複起動防止
+      let celestialTimerStarted = false;
       setTimeout(() => {
+        if (celestialTimerStarted) return;
+        celestialTimerStarted = true;
         const r = wrap.getBoundingClientRect();
         spawnCelestial(r.width, r.height);
         setInterval(() => {
+          // 同時に複数表示されている場合はスキップ
+          if (celestials.length >= 2) return;
           const r2 = wrap.getBoundingClientRect();
           spawnCelestial(r2.width, r2.height);
         }, 15000);
