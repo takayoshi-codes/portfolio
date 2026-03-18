@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>議事録 AI — Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@300;400&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f5f4ef;
+      --surface: #ffffff;
+      --surface2: #eeece5;
+      --border: rgba(0,0,0,0.08);
+      --border-md: rgba(0,0,0,0.16);
+      --text: #1a1a18;
+      --text-muted: #888780;
+      --text-dim: #bbb9b0;
+      --accent: #1a1a18;
+      --accent2: #4a6cf7;
+      --accent2-dim: rgba(74,108,247,0.08);
+      --tag-bg: #e8e6de;
+    }
+
+    html, body { height: 100%; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.7;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.5rem;
+      height: 52px;
+      border-bottom: 0.5px solid var(--border-md);
+      background: var(--surface);
+      flex-shrink: 0;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 14px;
+      letter-spacing: -0.3px;
+    }
+
+    .header-logo span { color: var(--accent2); }
+
+    .header-badge {
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      padding: 2px 8px;
+      border-radius: 100px;
+      background: var(--accent2-dim);
+      color: var(--accent2);
+      border: 0.5px solid rgba(74,108,247,0.25);
+    }
+
+    .header-info {
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+    }
+
+    /* ── MAIN LAYOUT ── */
+    .main {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* ── LEFT PANEL ── */
+    .panel-left {
+      width: 52%;
+      border-right: 0.5px solid var(--border-md);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 12px 16px;
+      border-bottom: 0.5px solid var(--border);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .char-count {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--text-dim);
+    }
+
+    textarea {
+      flex: 1;
+      resize: none;
+      border: none;
+      outline: none;
+      background: var(--surface);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      line-height: 1.8;
+      color: var(--text);
+      padding: 16px;
+      width: 100%;
+    }
+
+    textarea::placeholder { color: var(--text-dim); }
+
+    .panel-footer {
+      padding: 12px 16px;
+      border-top: 0.5px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--surface);
+      flex-shrink: 0;
+    }
+
+    /* ── SAMPLE BUTTONS ── */
+    .sample-label {
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .sample-btn {
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      border: 0.5px solid var(--border-md);
+      background: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      white-space: nowrap;
+    }
+
+    .sample-btn:hover { background: var(--tag-bg); color: var(--text); }
+
+    /* ── GENERATE BTN ── */
+    .generate-btn {
+      margin-left: auto;
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      border-radius: 6px;
+      padding: 8px 18px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .generate-btn:hover:not(:disabled) { opacity: 0.8; }
+    .generate-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ── RIGHT PANEL ── */
+    .panel-right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--surface);
+    }
+
+    /* ── RESULT AREA ── */
+    .result-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: var(--text-dim);
+      text-align: center;
+    }
+
+    .empty-icon {
+      font-size: 2rem;
+      opacity: 0.3;
+    }
+
+    .empty-text {
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    /* ── LOADING ── */
+    .loading-state {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+    }
+
+    .loading-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .loading-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent2);
+      animation: bounce 1.2s ease-in-out infinite;
+    }
+
+    .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+    .loading-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+
+    .loading-text {
+      font-size: 12px;
+      color: var(--text-muted);
+      letter-spacing: 0.06em;
+    }
+
+    /* ── MINUTES RESULT ── */
+    .minutes-result {
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+    }
+
+    .result-meta-tag {
+      background: var(--accent2-dim);
+      color: var(--accent2);
+      border: 0.5px solid rgba(74,108,247,0.2);
+      padding: 2px 8px;
+      border-radius: 100px;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+    }
+
+    .minutes-block {
+      margin-bottom: 20px;
+    }
+
+    .minutes-block-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 0.5px solid var(--border);
+    }
+
+    .minutes-block-body {
+      font-size: 13px;
+      line-height: 1.8;
+      color: var(--text);
+      white-space: pre-wrap;
+    }
+
+    .minutes-block-body ul,
+    .minutes-block-body ol {
+      padding-left: 1.2em;
+    }
+
+    /* ── ACTION ITEMS ── */
+    .action-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .action-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 8px 10px;
+      background: var(--bg);
+      border: 0.5px solid var(--border);
+      border-radius: 6px;
+      font-size: 12px;
+    }
+
+    .action-item-check {
+      width: 15px;
+      height: 15px;
+      border-radius: 3px;
+      border: 1.5px solid var(--border-md);
+      flex-shrink: 0;
+      margin-top: 1px;
+      cursor: pointer;
+      background: white;
+      transition: background 0.15s;
+    }
+
+    .action-item-check.checked {
+      background: var(--accent2);
+      border-color: var(--accent2);
+    }
+
+    .action-item-text { flex: 1; }
+
+    .action-item-owner {
+      font-size: 10px;
+      color: var(--text-muted);
+      background: var(--tag-bg);
+      padding: 1px 6px;
+      border-radius: 100px;
+      white-space: nowrap;
+    }
+
+    /* ── COPY BTN ── */
+    .result-actions {
+      padding: 12px 16px;
+      border-top: 0.5px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .copy-btn {
+      font-size: 11px;
+      padding: 6px 14px;
+      border-radius: 5px;
+      border: 0.5px solid var(--border-md);
+      background: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: background 0.15s;
+      letter-spacing: 0.04em;
+    }
+
+    .copy-btn:hover { background: var(--tag-bg); color: var(--text); }
+
+    /* ── DEMO BAR ── */
+    .demo-bar {
+      text-align: center;
+      padding: 6px;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      color: var(--text-dim);
+      border-top: 0.5px solid var(--border);
+      flex-shrink: 0;
+      background: var(--bg);
+    }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border-md); border-radius: 2px; }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-left">
+      <span class="header-logo">Minutes<span>AI</span></span>
+      <span class="header-badge">DEMO</span>
+    </div>
+    <span class="header-info">Claude Sonnet powered</span>
+  </header>
+
+  <div class="main">
+    <!-- LEFT: Input -->
+    <div class="panel-left">
+      <div class="panel-header">
+        <span>発言録・メモを貼り付け</span>
+        <span class="char-count" id="charCount">0 文字</span>
+      </div>
+      <textarea id="rawInput" placeholder="会議の発言録やメモをここに貼り付けてください。
+
+例）
+田中：今月の売上は先月比+12%でした。
+鈴木：要因は？
+田中：新機能リリースの効果と、広告費最適化が効きました。
+鈴木：来月の目標は？
+田中：+15%を目指したい。アクションとして、LP改善とリターゲティング強化を予定。
+鈴木：了解。田中さんが担当で、来週金曜までに進捗報告をお願いします。"></textarea>
+      <div class="panel-footer">
+        <span class="sample-label">サンプル</span>
+        <button class="sample-btn" data-sample="sales">売上MTG</button>
+        <button class="sample-btn" data-sample="product">開発会議</button>
+        <button class="sample-btn" data-sample="kickoff">キックオフ</button>
+        <button class="generate-btn" id="generateBtn" disabled>
+          <span id="btnIcon">✦</span>
+          <span id="btnLabel">議事録を生成</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- RIGHT: Result -->
+    <div class="panel-right">
+      <div class="panel-header">
+        <span>生成結果</span>
+        <span class="char-count" id="resultMeta"></span>
+      </div>
+      <div class="result-area" id="resultArea">
+        <div class="empty-state" id="emptyState">
+          <div class="empty-icon">✦</div>
+          <div class="empty-text">発言録を入力して<br>「議事録を生成」をクリック</div>
+        </div>
+      </div>
+      <div class="result-actions" id="resultActions" style="display:none">
+        <button class="copy-btn" id="copyBtn">テキストをコピー</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="demo-bar">Claude APIを使ったデモです — 生成結果は保存されません</div>
+
+  <script>
+    const SAMPLES = {
+      sales: `田中：今月の売上は先月比+12%でした。主な要因は新機能リリースと広告費の最適化です。
+鈴木：具体的にどのくらい広告費を削減できましたか？
+田中：CPAが20%改善し、ROASが1.8から2.4に向上しました。
+鈴木：来月の目標は？
+田中：+15%を目指します。アクションとして、LP改善とリターゲティング強化を予定しています。
+鈴木：LPはいつまでに？
+田中：来週金曜までにA/Bテストの設計を完了させます。私が担当します。
+鈴木：了解。進捗は週次で共有してください。`,
+
+      product: `山田：スプリント14の振り返りです。完了タスクは23/28でした。
+佐藤：残り5つの原因は？
+山田：認証周りの仕様変更で2タスクが遅延。残り3つはQAからの差し戻しです。
+佐藤：QAとの連携フローを見直す必要がありますね。
+山田：同意します。スプリント15からはQAを早期にレビューサイクルに入れます。
+佐藤：次のスプリントの優先事項は？
+山田：検索機能の改善とパフォーマンス最適化です。目標はLCPを2秒以下にすること。
+佐藤：山田さん、技術選定を今週中に資料にまとめてもらえますか？`,
+
+      kickoff: `プロジェクトリーダー伊藤：本日からECサイトリニューアルプロジェクトを開始します。期間は3ヶ月、予算は500万円です。
+デザイナー小林：デザインの方向性はどう決めますか？
+伊藤：来週のユーザーインタビュー結果を踏まえてペルソナを設定します。小林さんに担当してもらいます。
+エンジニア中田：技術スタックはどうしますか？
+伊藤：Next.jsとSupabaseを採用予定ですが、中田さんに技術選定書を作成してもらい、来週月曜に共有してください。
+小林：スケジュールのマイルストーンを確認したい。
+伊藤：1ヶ月目でUI設計完了、2ヶ月目でベータ版、3ヶ月目で本番リリースです。
+全員：了解しました。`,
+    };
+
+    const rawInput    = document.getElementById('rawInput');
+    const generateBtn = document.getElementById('generateBtn');
+    const resultArea  = document.getElementById('resultArea');
+    const charCount   = document.getElementById('charCount');
+    const resultMeta  = document.getElementById('resultMeta');
+    const resultActions = document.getElementById('resultActions');
+    const btnIcon     = document.getElementById('btnIcon');
+    const btnLabel    = document.getElementById('btnLabel');
+
+    rawInput.addEventListener('input', () => {
+      const len = rawInput.value.length;
+      charCount.textContent = len + ' 文字';
+      generateBtn.disabled = len < 10;
+    });
+
+    document.querySelectorAll('.sample-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        rawInput.value = SAMPLES[btn.dataset.sample] || '';
+        rawInput.dispatchEvent(new Event('input'));
+      });
+    });
+
+    generateBtn.addEventListener('click', generate);
+
+    async function generate() {
+      const text = rawInput.value.trim();
+      if (!text) return;
+
+      // Loading state
+      generateBtn.disabled = true;
+      btnIcon.textContent = '…';
+      btnLabel.textContent = '生成中';
+      resultArea.innerHTML = `
+        <div class="loading-state">
+          <div class="loading-dots">
+            <div class="loading-dot"></div>
+            <div class="loading-dot"></div>
+            <div class="loading-dot"></div>
+          </div>
+          <span class="loading-text">CLAUDE が解析中…</span>
+        </div>`;
+      resultActions.style.display = 'none';
+      resultMeta.textContent = '';
+
+      const prompt = `以下の会議の発言録・メモから、構造化された議事録を生成してください。
+
+発言録：
+${text}
+
+以下のJSONフォーマットで返してください（JSONのみ、説明文不要）：
+{
+  "title": "会議タイトル（内容から推測）",
+  "date": "（不明な場合は「未記載」）",
+  "summary": "会議全体の要約（2〜3文）",
+  "decisions": ["決定事項1", "決定事項2"],
+  "actions": [
+    { "text": "アクションアイテム", "owner": "担当者名（不明なら「未定」）", "due": "期限（不明なら「未定」）" }
+  ],
+  "notes": "その他の重要な議事（自由記述）"
+}`;
+
+      try {
+        const res = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 1000,
+            messages: [{ role: 'user', content: prompt }],
+          }),
+        });
+
+        const data = await res.json();
+        const raw  = data.content?.[0]?.text || '';
+
+        // Extract JSON
+        const jsonMatch = raw.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) throw new Error('parse error');
+        const minutes = JSON.parse(jsonMatch[0]);
+
+        renderMinutes(minutes);
+        resultMeta.textContent = 'AI生成 — ' + new Date().toLocaleTimeString('ja-JP');
+        resultActions.style.display = 'flex';
+      } catch (err) {
+        resultArea.innerHTML = `<div class="empty-state">
+          <div class="empty-icon">⚠</div>
+          <div class="empty-text">生成中にエラーが発生しました<br><small>${err.message}</small></div>
+        </div>`;
+      } finally {
+        generateBtn.disabled = false;
+        btnIcon.textContent = '✦';
+        btnLabel.textContent = '再生成';
+      }
+    }
+
+    function renderMinutes(m) {
+      const actionsHtml = (m.actions || []).map((a, i) => `
+        <div class="action-item">
+          <div class="action-item-check" data-index="${i}" onclick="this.classList.toggle('checked')"></div>
+          <div class="action-item-text">${esc(a.text)}${a.due && a.due !== '未定' ? `　<small style="color:var(--text-muted)">${esc(a.due)}</small>` : ''}</div>
+          <span class="action-item-owner">${esc(a.owner)}</span>
+        </div>`).join('');
+
+      const decisionsHtml = (m.decisions || []).map(d => `<div style="margin-bottom:4px">・ ${esc(d)}</div>`).join('');
+
+      resultArea.innerHTML = `
+        <div class="minutes-result">
+          <div class="result-meta">
+            <span class="result-meta-tag">AI 生成</span>
+            ${esc(m.title || '無題の会議')} ${m.date && m.date !== '未記載' ? '— ' + esc(m.date) : ''}
+          </div>
+
+          <div class="minutes-block">
+            <div class="minutes-block-title">サマリー</div>
+            <div class="minutes-block-body">${esc(m.summary || '')}</div>
+          </div>
+
+          ${decisionsHtml ? `<div class="minutes-block">
+            <div class="minutes-block-title">決定事項</div>
+            <div class="minutes-block-body">${decisionsHtml}</div>
+          </div>` : ''}
+
+          ${actionsHtml ? `<div class="minutes-block">
+            <div class="minutes-block-title">アクションアイテム</div>
+            <div class="action-list">${actionsHtml}</div>
+          </div>` : ''}
+
+          ${m.notes ? `<div class="minutes-block">
+            <div class="minutes-block-title">その他メモ</div>
+            <div class="minutes-block-body">${esc(m.notes)}</div>
+          </div>` : ''}
+        </div>`;
+    }
+
+    function esc(s) {
+      return String(s || '').replace(/[&<>"]/g, c =>
+        ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    }
+
+    // Copy button
+    document.getElementById('copyBtn').addEventListener('click', () => {
+      const el = resultArea.querySelector('.minutes-result');
+      if (!el) return;
+      navigator.clipboard.writeText(el.innerText).then(() => {
+        const btn = document.getElementById('copyBtn');
+        btn.textContent = 'コピーしました ✓';
+        setTimeout(() => { btn.textContent = 'テキストをコピー'; }, 2000);
+      });
+    });
+  </script>
+</body>
+</html>
