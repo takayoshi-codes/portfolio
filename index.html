@@ -73,7 +73,7 @@
 
     /* HERO */
     .hero-wrap { position: relative; width: 100%; overflow: hidden; border-bottom: 0.5px solid var(--border); }
-    .hero-canvas-wrap { width: 100%; aspect-ratio: 16 / 6; position: relative; cursor: none; }
+    .hero-canvas-wrap { width: 100%; aspect-ratio: 16 / 7; position: relative; cursor: none; }
     canvas#heroCanvas { position: absolute; inset: 0; width: 100%; height: 100%; }
     .hero-label {
       position: absolute; bottom: 1.8rem;
@@ -310,10 +310,10 @@
         </span>
       </a>
       <ul class="nav-links">
-        <li><a href="#about">About</a></li>
         <li><a href="#service">Service</a></li>
         <li><a href="#works">Works</a></li>
         <li><a href="#skills">Skills</a></li>
+        <li><a href="#about">About</a></li>
         <li><a href="#contact">Contact</a></li>
       </ul>
     </div>
@@ -352,39 +352,6 @@
     </div>
   </div>
 
-  <!-- ABOUT -->
-  <section class="section" id="about">
-    <div class="section-header">
-      <span class="section-title">About</span>
-    </div>
-    <div class="about-layout">
-      <div>
-        <div class="about-name-ja">Matsuno Takayoshi</div>
-        <div class="about-name-en">Yamaguchi, Japan</div>
-        <div class="about-badges">
-          <span class="about-badge">Fullstack Engineer</span>
-          <span class="about-badge">AI Engineer</span>
-          <span class="about-badge">FP 資格保有</span>
-        </div>
-      </div>
-      <div class="about-body">
-        <p>
-          山口県出身のエンジニア。大学卒業後、SIer 企業にて PG・SE・PM として
-          <strong>金融・保険領域のプロダクト</strong>の新規開発から保守・運用まで幅広く従事。
-        </p>
-        <p>
-          <strong>FP（ファイナンシャルプランナー）</strong>の資格を保有しており、
-          業務要件を深く理解したうえでの開発が強み。
-          フロントエンドからバックエンドまでのフルスタック Web アプリ開発はもちろん、
-          <strong>AI を活用した業務効率化</strong>の提案・実装も対応可能です。
-        </p>
-        <p>
-          副業・フリーランス案件のご依頼は、お気軽にお問い合わせください。
-        </p>
-      </div>
-    </div>
-  </section>
-
   <!-- SERVICE -->
   <section class="section" id="service">
     <div class="section-header">
@@ -393,21 +360,21 @@
     <div class="service-grid">
       <div class="service-item">
         <div class="service-no">01</div>
-        <div class="service-name-ja">フロントエンド開発</div>
-        <div class="service-name-en">Frontend Development</div>
-        <p class="service-desc">React / Next.js を用いた高品質な UI の実装。パフォーマンスとアクセシビリティを意識した設計・開発を行います。</p>
+        <div class="service-name-ja">AI・機械学習 開発</div>
+        <div class="service-name-en">AI / Machine Learning</div>
+        <p class="service-desc">画像分類・自然言語処理・時系列予測など機械学習モデルの設計から、Django / Streamlit を使った Web サービスへの組み込みまで一貫して対応します。</p>
       </div>
       <div class="service-item">
         <div class="service-no">02</div>
-        <div class="service-name-ja">バックエンド開発</div>
-        <div class="service-name-en">Backend Development</div>
-        <p class="service-desc">Python / FastAPI を中心とした API サーバーの構築。DB 設計からデプロイまで、要件に合わせて柔軟に対応します。</p>
+        <div class="service-name-ja">Web アプリ開発</div>
+        <div class="service-name-en">Web Application</div>
+        <p class="service-desc">Python / Django を軸にしたフルスタック開発。DB 設計・ユーザー認証・REST API 構築からクラウドデプロイまで、要件に合わせて柔軟に対応します。</p>
       </div>
       <div class="service-item">
         <div class="service-no">03</div>
-        <div class="service-name-ja">UI / UX デザイン</div>
-        <div class="service-name-en">UI / UX Design</div>
-        <p class="service-desc">Figma を使ったワイヤーフレーム・デザインカンプの作成。ユーザー体験を重視したインターフェース設計を得意としています。</p>
+        <div class="service-name-ja">業務自動化・効率化</div>
+        <div class="service-name-en">Business Automation</div>
+        <p class="service-desc">スクレイピング・Excel レポート自動生成・Slack / メール通知 Bot など、手作業をコードで削減する仕組みを設計・構築します。</p>
       </div>
     </div>
   </section>
@@ -644,6 +611,39 @@
     </div>
   </section>
 
+  <!-- ABOUT -->
+  <section class="section" id="about">
+    <div class="section-header">
+      <span class="section-title">About</span>
+    </div>
+    <div class="about-layout">
+      <div>
+        <div class="about-name-ja">Matsuno Takayoshi</div>
+        <div class="about-name-en">Yamaguchi, Japan</div>
+        <div class="about-badges">
+          <span class="about-badge">Fullstack Engineer</span>
+          <span class="about-badge">AI Engineer</span>
+          <span class="about-badge">FP 資格保有</span>
+        </div>
+      </div>
+      <div class="about-body">
+        <p>
+          山口県出身のエンジニア。大学卒業後、SIer 企業にて PG・SE・PM として
+          <strong>金融・保険領域のプロダクト</strong>の新規開発から保守・運用まで幅広く従事。
+        </p>
+        <p>
+          <strong>FP（ファイナンシャルプランナー）</strong>の資格を保有しており、
+          業務要件を深く理解したうえでの開発が強み。
+          フロントエンドからバックエンドまでのフルスタック Web アプリ開発はもちろん、
+          <strong>AI を活用した業務効率化</strong>の提案・実装も対応可能です。
+        </p>
+        <p>
+          副業・フリーランス案件のご依頼は、お気軽にお問い合わせください。
+        </p>
+      </div>
+    </div>
+  </section>
+
   <!-- CONTACT -->
   <section class="section" id="contact">
     <div class="section-header">
@@ -673,8 +673,8 @@
     <div class="footer">
       <span class="footer-copy">© Matsuno Takayoshi. All rights reserved.</span>
       <ul class="footer-links">
-        <li><a href="#about">About</a></li>
         <li><a href="#works">Works</a></li>
+        <li><a href="#about">About</a></li>
         <li><a href="#contact">Contact</a></li>
         <li><a href="https://github.com/" target="_blank" rel="noopener">GitHub</a></li>
       </ul>
