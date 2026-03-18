@@ -225,7 +225,61 @@
     .btn-primary:hover { opacity: 0.7; }
     .contact-note { font-size: 11px; color: var(--text-muted); letter-spacing: 0.02em; line-height: 1.9; }
 
-    /* FOOTER */
+    /* CONTACT FORM MODAL */
+    .cf-backdrop {
+      position: fixed; inset: 0; z-index: 1100;
+      background: rgba(8,8,6,0.75);
+      backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 1.5rem;
+      opacity: 0; pointer-events: none; transition: opacity 0.28s ease;
+    }
+    .cf-backdrop.open { opacity: 1; pointer-events: all; }
+    .cf-window {
+      background: var(--bg-white); border: 0.5px solid var(--border-md);
+      width: 100%; max-width: 520px;
+      padding: 2.5rem 2rem;
+      transform: translateY(16px) scale(0.98);
+      transition: transform 0.32s cubic-bezier(0.22,1,0.36,1);
+    }
+    .cf-backdrop.open .cf-window { transform: translateY(0) scale(1); }
+    .cf-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2rem; }
+    .cf-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.1rem; letter-spacing: -0.3px; }
+    .cf-close { background: none; border: none; cursor: pointer; font-size: 16px; color: var(--text-muted); padding: 4px; transition: color 0.2s; line-height: 1; }
+    .cf-close:hover { color: var(--text); }
+    .cf-field { margin-bottom: 1.2rem; }
+    .cf-label { display: block; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
+    .cf-label span.required { color: #c84020; }
+    .cf-label span.optional { color: #2563eb; }
+    .cf-input, .cf-textarea, select.cf-input {
+      width: 100%; background: var(--bg); color: var(--text);
+      border: 0.5px solid var(--border-md); border-radius: 1px;
+      padding: 10px 12px; font-size: 13px; font-family: 'DM Sans', sans-serif;
+      transition: border-color 0.2s; outline: none;
+      appearance: none; -webkit-appearance: none;
+    }
+    select.cf-input { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888780' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; cursor: pointer; }
+    .cf-input:focus, .cf-textarea:focus { border-color: var(--accent); }
+    .cf-error { font-size: 11px; color: #c84020; margin-top: 4px; display: none; }
+    .cf-input.invalid { border-color: #c84020; }
+    .cf-input.valid   { border-color: #3aa856; }
+    .cf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 480px) { .cf-row { grid-template-columns: 1fr; } }
+    .cf-submit {
+      width: 100%; padding: 12px; margin-top: 0.5rem;
+      background: var(--accent); color: var(--bg);
+      border: none; border-radius: 1px; cursor: pointer;
+      font-family: 'DM Sans', sans-serif; font-size: 11px;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      transition: opacity 0.2s;
+    }
+    .cf-submit:hover { opacity: 0.75; }
+    .cf-submit:disabled { opacity: 0.4; cursor: not-allowed; }
+    .cf-note { font-size: 11px; color: var(--text-muted); margin-top: 1rem; text-align: center; line-height: 1.8; }
+    .cf-success { text-align: center; padding: 2rem 0; }
+    .cf-success-icon { font-size: 2rem; margin-bottom: 1rem; }
+    .cf-success-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.1rem; margin-bottom: 0.5rem; }
+    .cf-success-sub { font-size: 13px; color: var(--text-muted); line-height: 1.9; }
     .footer {
       max-width: var(--max-w); margin: 0 auto; padding: 2rem;
       display: flex; justify-content: space-between; align-items: center;
@@ -659,7 +713,7 @@
         </p>
       </div>
       <div class="contact-action">
-        <a class="btn btn-primary" href="/cdn-cgi/l/email-protection#e891879d9aa88d85898184c68b8785">お問い合わせ →</a>
+        <button class="btn btn-primary" onclick="openContactForm()">お問い合わせ →</button>
         <p class="contact-note">
           返信は通常 1〜2 営業日以内にお送りします。<br>
           案件の規模・予算問わずお気軽にどうぞ。
@@ -667,6 +721,78 @@
       </div>
     </div>
   </section>
+
+  <!-- CONTACT FORM MODAL -->
+  <div class="cf-backdrop" id="contactModal" role="dialog" aria-modal="true" aria-label="お問い合わせ">
+    <div class="cf-window">
+      <div class="cf-header">
+        <span class="cf-title">お問い合わせ</span>
+        <button class="cf-close" onclick="closeContactForm()" aria-label="閉じる">✕</button>
+      </div>
+      <div id="cfForm">
+        <form id="contactForm">
+          <input type="hidden" name="_subject" value="【ポートフォリオ】お問い合わせ">
+          <div class="cf-row">
+            <div class="cf-field">
+              <label class="cf-label" for="cf-name">お名前 <span class="required">*必須</span></label>
+              <input class="cf-input" id="cf-name" name="name" type="text" placeholder="山田 太郎" required>
+            </div>
+            <div class="cf-field">
+              <label class="cf-label" for="cf-company">会社名 <span class="optional">任意</span></label>
+              <input class="cf-input" id="cf-company" name="company" type="text" placeholder="株式会社〇〇">
+            </div>
+          </div>
+          <div class="cf-field">
+            <label class="cf-label" for="cf-email">メールアドレス <span class="required">*必須</span></label>
+            <input class="cf-input" id="cf-email" name="email" type="email" placeholder="example@email.com" required>
+            <span class="cf-error" id="cf-email-error">有効なメールアドレスを入力してください（例：example@email.com）</span>
+          </div>
+          <div class="cf-row">
+            <div class="cf-field">
+              <label class="cf-label" for="cf-type">お問い合わせ種別 <span class="required">*必須</span></label>
+              <select class="cf-input" id="cf-type" name="type" required>
+                <option value="" disabled selected>選択してください</option>
+                <option value="Web アプリ開発">Web アプリ開発</option>
+                <option value="AI・機械学習 開発">AI・機械学習 開発</option>
+                <option value="業務自動化・効率化">業務自動化・効率化</option>
+                <option value="その他">その他</option>
+              </select>
+            </div>
+            <div class="cf-field">
+              <label class="cf-label" for="cf-budget">予算感 <span class="optional">任意</span></label>
+              <select class="cf-input" id="cf-budget" name="budget">
+                <option value="" disabled selected>選択してください</option>
+                <option value="〜10万円">〜10万円</option>
+                <option value="10〜30万円">10〜30万円</option>
+                <option value="30〜50万円">30〜50万円</option>
+                <option value="50〜100万円">50〜100万円</option>
+                <option value="100万円〜">100万円〜</option>
+                <option value="要相談">要相談</option>
+              </select>
+            </div>
+          </div>
+          <div class="cf-field">
+            <label class="cf-label" for="cf-subject">件名 <span class="required">*必須</span></label>
+            <input class="cf-input" id="cf-subject" name="subject_detail" type="text" placeholder="Web アプリ開発のご相談" required>
+          </div>
+          <div class="cf-field">
+            <label class="cf-label" for="cf-message">お問い合わせ内容 <span class="required">*必須</span></label>
+            <textarea class="cf-textarea" id="cf-message" name="message" placeholder="ご依頼内容・ご質問をご記入ください。" required></textarea>
+          </div>
+          <button class="cf-submit" type="submit" id="cfSubmitBtn">送信する</button>
+        </form>
+        <p class="cf-note">
+          送信内容は Web3Forms 経由で安全に届きます。<br>
+          返信は通常 1〜2 営業日以内にお送りします。
+        </p>
+      </div>
+      <div id="cfSuccess" class="cf-success" style="display:none;">
+        <div class="cf-success-icon">✓</div>
+        <div class="cf-success-title">送信完了しました</div>
+        <p class="cf-success-sub">お問い合わせありがとうございます。<br>1〜2 営業日以内にご返信いたします。</p>
+      </div>
+    </div>
+  </div>
 
   <!-- FOOTER -->
   <a href="#top" class="totop">↑ Page Top</a>
@@ -1193,6 +1319,90 @@
         document.getElementById('heroTxt').classList.add('in');
       }, 100);
     })();
+
+    /* ── CONTACT FORM ── */
+    function openContactForm() {
+      document.getElementById('contactModal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeContactForm() {
+      document.getElementById('contactModal').classList.remove('open');
+      document.body.style.overflow = '';
+      setTimeout(() => {
+        document.getElementById('cfForm').style.display = 'block';
+        document.getElementById('cfSuccess').style.display = 'none';
+        document.getElementById('contactForm').reset();
+        document.getElementById('cfSubmitBtn').disabled = false;
+        document.getElementById('cfSubmitBtn').textContent = '送信する';
+      }, 300);
+    }
+    document.getElementById('contactModal').addEventListener('click', e => {
+      if (e.target === document.getElementById('contactModal')) closeContactForm();
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && document.getElementById('contactModal').classList.contains('open')) closeContactForm();
+    });
+    /* ── EMAIL VALIDATION ── */
+    const emailRegex = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+    const cfEmail = document.getElementById('cf-email');
+    const cfEmailError = document.getElementById('cf-email-error');
+
+    function validateEmail(val) {
+      if (!val) return null;
+      return emailRegex.test(val);
+    }
+
+    cfEmail.addEventListener('blur', () => {
+      const val = cfEmail.value.trim();
+      if (!val) {
+        cfEmail.classList.remove('invalid','valid');
+        cfEmailError.style.display = 'none';
+        return;
+      }
+      if (validateEmail(val)) {
+        cfEmail.classList.remove('invalid'); cfEmail.classList.add('valid');
+        cfEmailError.style.display = 'none';
+      } else {
+        cfEmail.classList.remove('valid'); cfEmail.classList.add('invalid');
+        cfEmailError.style.display = 'block';
+      }
+    });
+
+    document.getElementById('contactForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      // 送信前にメールを最終チェック
+      const emailVal = cfEmail.value.trim();
+      if (!validateEmail(emailVal)) {
+        cfEmail.classList.add('invalid');
+        cfEmailError.style.display = 'block';
+        cfEmail.focus();
+        return;
+      }
+      const btn = document.getElementById('cfSubmitBtn');
+      btn.disabled = true;
+      btn.textContent = '送信中…';
+      const formData = new FormData(e.target);
+      try {
+        const res = await fetch('https://formspree.io/f/76851e57-763c-46af-a3e1-7a0bbf0dbc04', {
+          method: 'POST',
+          body: formData,
+          headers: { 'Accept': 'application/json' },
+        });
+        const data = await res.json();
+        if (res.ok) {
+          document.getElementById('cfForm').style.display = 'none';
+          document.getElementById('cfSuccess').style.display = 'block';
+        } else {
+          btn.disabled = false;
+          btn.textContent = '送信する';
+          alert('送信に失敗しました。時間をおいて再度お試しください。');
+        }
+      } catch {
+        btn.disabled = false;
+        btn.textContent = '送信する';
+        alert('通信エラーが発生しました。時間をおいて再度お試しください。');
+      }
+    });
 
     /* ── SCROLL FADE-IN ── */
     const obs = new IntersectionObserver(entries => {
