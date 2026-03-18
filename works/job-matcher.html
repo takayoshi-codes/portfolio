@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>求人票×職務経歴書 マッチング診断ツール</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="_common.css">
+<style>
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+  @media(max-width:480px){.two-col{grid-template-columns:1fr;}}
+  textarea { width:100%; border:0.5px solid var(--border-md); background:var(--bg); color:var(--text); padding:10px; font-size:12px; font-family:inherit; resize:vertical; border-radius:1px; min-height:90px; }
+  .col-label { font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--text-muted); margin-bottom:5px; }
+  .score-circle-wrap { display:flex; justify-content:center; margin:1rem 0 0.5rem; }
+  .score-circle { position:relative; width:100px; height:100px; }
+  canvas#scoreRing { position:absolute; inset:0; }
+  .score-inner { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .score-num { font-size:26px; font-weight:700; font-family:monospace; line-height:1; }
+  .score-unit { font-size:11px; color:var(--text-muted); }
+  .skill-match { margin-top:1rem; }
+  .skill-row2 { display:flex; align-items:center; gap:8px; margin-bottom:8px; font-size:12px; }
+  .skill-name2 { width:100px; flex-shrink:0; }
+  .skill-bg2 { flex:1; height:5px; background:var(--border-md); border-radius:2px; overflow:hidden; }
+  .skill-fill2 { height:100%; border-radius:2px; transition:width 0.8s ease; }
+  .match { background:#3aa856; }
+  .partial { background:#c8930a; }
+  .missing { background:#c84020; }
+  .legend { display:flex; gap:12px; font-size:11px; color:var(--text-muted); margin-bottom:8px; flex-wrap:wrap; }
+  .legend-dot { width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:3px; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="app-header">
+    <div class="app-tag">NLP — 07</div>
+    <div class="app-title">求人票×職務経歴書 マッチング診断</div>
+    <p class="app-desc">求人票と職務経歴書を Word2Vec・BERT でベクトル化し、コサイン類似度でマッチングスコアを算出。不足スキルをハイライトし改善アドバイスを自動生成。</p>
+  </div>
+  <div class="layout">
+    <div>
+      <div class="meta-block">
+        <div class="meta-label">使用技術</div>
+        <div class="tags-wrap">
+          <span class="tag">Word2Vec</span><span class="tag">BERT</span>
+          <span class="tag">MeCab</span><span class="tag">scikit-learn</span>
+          <span class="tag">Streamlit</span>
+        </div>
+      </div>
+      <div class="meta-block">
+        <div class="meta-label">主な機能</div>
+        <div class="meta-body">テキスト入力・ベクトル化<br>コサイン類似度計算<br>マッチングスコア表示<br>不足スキルハイライト<br>改善アドバイス生成</div>
+      </div>
+      <div class="meta-block">
+        <div class="meta-label">アピール点</div>
+        <div class="meta-body">Word2Vec と BERT の両手法を比較実装。実用性の高いキャリアツール。</div>
+      </div>
+    </div>
+    <div>
+      <div class="demo-box">
+        <div class="demo-label">マッチング診断デモ</div>
+        <div class="two-col">
+          <div>
+            <div class="col-label">求人票</div>
+            <textarea id="jd">Python・機械学習経験者。Django・PostgreSQL・AWS の実務経験歓迎。チームでのアジャイル開発経験があれば尚可。</textarea>
+          </div>
+          <div>
+            <div class="col-label">職務経歴書</div>
+            <textarea id="cv">Pythonを3年使用。scikit-learnで機械学習モデル開発経験あり。Django・PostgreSQLでWebアプリ構築。AWSは未経験。</textarea>
+          </div>
+        </div>
+        <button class="btn" onclick="matchScore()">診断する</button>
+        <div id="matchResult" style="display:none;">
+          <div class="score-circle-wrap">
+            <div class="score-circle">
+              <canvas id="scoreRing" width="100" height="100"></canvas>
+              <div class="score-inner">
+                <div class="score-num" id="scoreNum">—</div>
+                <div class="score-unit">match</div>
+              </div>
+            </div>
+          </div>
+          <div class="skill-match">
+            <div class="legend">
+              <span><span class="legend-dot" style="background:#3aa856"></span>合致</span>
+              <span><span class="legend-dot" style="background:#c8930a"></span>一部合致</span>
+              <span><span class="legend-dot" style="background:#c84020"></span>不足</span>
+            </div>
+            <div id="skillBars"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function matchScore() {
+  const skills = [
+    { name:'Python',        score:95, cls:'match'   },
+    { name:'機械学習',      score:80, cls:'match'   },
+    { name:'Django',        score:90, cls:'match'   },
+    { name:'PostgreSQL',    score:85, cls:'match'   },
+    { name:'AWS',           score:15, cls:'missing' },
+    { name:'アジャイル',    score:40, cls:'partial' },
+  ];
+  const total = Math.round(skills.reduce((s,k)=>s+k.score,0)/skills.length);
+  document.getElementById('matchResult').style.display = 'block';
+  document.getElementById('scoreNum').textContent = total + '%';
+  drawRing(total);
+  document.getElementById('skillBars').innerHTML = skills.map(s=>`
+    <div class="skill-row2">
+      <span class="skill-name2">${s.name}</span>
+      <div class="skill-bg2"><div class="skill-fill2 ${s.cls}" style="width:0%" data-w="${s.score}"></div></div>
+      <span style="font-size:11px;color:var(--text-muted);min-width:30px;text-align:right">${s.score}%</span>
+    </div>`).join('');
+  setTimeout(()=>{
+    document.querySelectorAll('.skill-fill2').forEach(b=>b.style.width=b.dataset.w+'%');
+  },50);
+}
+function drawRing(pct) {
+  const cv = document.getElementById('scoreRing');
+  const ctx = cv.getContext('2d');
+  const isDark = window.matchMedia('(prefers-color-scheme:dark)').matches;
+  ctx.clearRect(0,0,100,100);
+  const cx=50,cy=50,r=40;
+  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
+  ctx.strokeStyle=isDark?'rgba(255,255,255,0.1)':'rgba(28,28,26,0.1)'; ctx.lineWidth=6; ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+Math.PI*2*pct/100);
+  ctx.strokeStyle=pct>=70?'#3aa856':pct>=50?'#c8930a':'#c84020';
+  ctx.lineWidth=6; ctx.lineCap='round'; ctx.stroke();
+}
+</script>
+</body>
+</html>

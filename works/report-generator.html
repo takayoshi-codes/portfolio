@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>週次レポート自動生成ツール</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="_common.css">
+<style>
+  .upload-zone { border:1px dashed var(--border-md); padding:1.5rem; text-align:center; border-radius:2px; cursor:pointer; transition:background 0.2s; margin-bottom:1rem; }
+  .upload-zone:hover { background:var(--tag-bg); }
+  .upload-text { font-size:12px; color:var(--text-muted); }
+  .kpi-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-bottom:1rem; }
+  .kpi-item { background:var(--tag-bg); padding:10px; border-radius:1px; }
+  .kpi-val { font-size:18px; font-weight:700; font-family:monospace; }
+  .kpi-lbl { font-size:10px; color:var(--text-muted); margin-top:2px; }
+  .kpi-diff { font-size:11px; margin-top:3px; }
+  .up   { color:#3aa856; }
+  .down { color:#c84020; }
+  .chart-area2 { height:110px; position:relative; margin-bottom:1rem; }
+  canvas#reportChart { width:100%; height:100%; }
+  .export-row { display:flex; gap:8px; flex-wrap:wrap; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="app-header">
+    <div class="app-tag">Business Automation — 09</div>
+    <div class="app-title">週次レポート自動生成ツール</div>
+    <p class="app-desc">CSV を読み込み KPI 集計・グラフ生成・Excel / PDF レポートを自動出力。営業・管理部門が毎週手作業でやっている業務を数クリックで完結。非エンジニアでも使える UI 設計。</p>
+  </div>
+  <div class="layout">
+    <div>
+      <div class="meta-block">
+        <div class="meta-label">使用技術</div>
+        <div class="tags-wrap">
+          <span class="tag">pandas</span><span class="tag">openpyxl</span>
+          <span class="tag">Matplotlib</span><span class="tag">reportlab</span>
+          <span class="tag">Streamlit</span>
+        </div>
+      </div>
+      <div class="meta-block">
+        <div class="meta-label">主な機能</div>
+        <div class="meta-body">CSV 取込・KPI 集計<br>グラフ自動生成<br>Excel テンプレ出力<br>PDF レポート出力</div>
+      </div>
+      <div class="meta-block">
+        <div class="meta-label">アピール点</div>
+        <div class="meta-body">「業務時間を削減できる」提案を具体的に示す。非エンジニア部門への価値提供を実証。</div>
+      </div>
+    </div>
+    <div>
+      <div class="demo-box">
+        <div class="demo-label">レポート生成デモ</div>
+        <div class="upload-zone" onclick="loadSample()">
+          <div style="font-size:24px;opacity:0.4;margin-bottom:6px;">📂</div>
+          <div class="upload-text">CSV をドロップ、またはクリックしてサンプルデータを読み込む</div>
+        </div>
+        <div id="reportArea" style="display:none;">
+          <div class="kpi-grid">
+            <div class="kpi-item"><div class="kpi-val" id="kpi1">—</div><div class="kpi-lbl">総売上</div><div class="kpi-diff up" id="kpi1d"></div></div>
+            <div class="kpi-item"><div class="kpi-val" id="kpi2">—</div><div class="kpi-lbl">件数</div><div class="kpi-diff up" id="kpi2d"></div></div>
+            <div class="kpi-item"><div class="kpi-val" id="kpi3">—</div><div class="kpi-lbl">客単価</div><div class="kpi-diff down" id="kpi3d"></div></div>
+          </div>
+          <div class="chart-area2"><canvas id="reportChart"></canvas></div>
+          <div class="export-row">
+            <button class="btn" onclick="alert('Excel ファイルを生成しました（デモ）')">📊 Excel 出力</button>
+            <button class="btn btn-outline" onclick="alert('PDF レポートを生成しました（デモ）')">📄 PDF 出力</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+const weekData = [420,385,510,468,532,490,615];
+const weeks    = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+function loadSample() {
+  document.getElementById('reportArea').style.display = 'block';
+  const total = weekData.reduce((a,b)=>a+b,0);
+  document.getElementById('kpi1').textContent = (total/10000).toFixed(1)+'万';
+  document.getElementById('kpi1d').textContent = '▲ 12.4% 先週比';
+  document.getElementById('kpi2').textContent = weekData.length*8+'件';
+  document.getElementById('kpi2d').textContent = '▲ 8件 先週比';
+  document.getElementById('kpi3').textContent = Math.round(total/(weekData.length*8))+'円';
+  document.getElementById('kpi3d').textContent = '▼ 3.1% 先週比';
+  drawChart();
+}
+
+function drawChart() {
+  const cv = document.getElementById('reportChart');
+  const dpr = window.devicePixelRatio||1;
+  const rect = cv.parentElement.getBoundingClientRect();
+  cv.width = rect.width*dpr; cv.height = rect.height*dpr;
+  cv.style.width = rect.width+'px'; cv.style.height = rect.height+'px';
+  const ctx = cv.getContext('2d'); ctx.scale(dpr,dpr);
+  const w=rect.width, h=rect.height;
+  const isDark = window.matchMedia('(prefers-color-scheme:dark)').matches;
+  const max = Math.max(...weekData)*1.1;
+  const bw = (w*0.82)/weekData.length;
+  for(let i=1;i<=3;i++){
+    const y=h*0.1+(h*0.72)*(i/3);
+    ctx.beginPath(); ctx.moveTo(w*0.08,y); ctx.lineTo(w*0.95,y);
+    ctx.strokeStyle=isDark?'rgba(255,255,255,0.07)':'rgba(28,28,26,0.07)'; ctx.lineWidth=0.5; ctx.stroke();
+  }
+  weekData.forEach((v,i)=>{
+    const x=w*0.09+i*bw+bw*0.1, bh=v/max*(h*0.7), y=h*0.82-bh;
+    ctx.fillStyle=i===weekData.length-1
+      ? (isDark?'rgba(238,237,230,0.7)':'rgba(28,28,26,0.7)')
+      : (isDark?'rgba(238,237,230,0.15)':'rgba(28,28,26,0.12)');
+    ctx.fillRect(x, y, bw*0.72, bh);
+    ctx.fillStyle=isDark?'rgba(238,237,230,0.4)':'rgba(28,28,26,0.4)';
+    ctx.font='9px monospace'; ctx.textAlign='center';
+    ctx.fillText(weeks[i], x+bw*0.36, h*0.94);
+  });
+}
+</script>
+</body>
+</html>

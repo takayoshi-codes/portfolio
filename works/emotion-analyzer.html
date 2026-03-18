@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>マルチモーダル複合感情・ストレス分析ツール</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="_common.css">
+<style>
+  .mode-tabs { display: flex; gap: 4px; margin-bottom: 1rem; }
+  .mode-tab { font-size: 11px; padding: 5px 12px; border: 0.5px solid var(--border-md); background: var(--bg); color: var(--text-muted); cursor: pointer; border-radius: 1px; transition: all 0.15s; }
+  .mode-tab.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+  .input-panel { display: none; }
+  .input-panel.active { display: block; }
+  textarea { width: 100%; border: 0.5px solid var(--border-md); background: var(--bg); color: var(--text); padding: 10px; font-size: 13px; font-family: inherit; resize: vertical; border-radius: 1px; min-height: 80px; }
+  .radar-wrap { display: flex; justify-content: center; margin: 0.5rem 0; }
+  canvas#radarChart { }
+  .emotion-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; margin-top: 1rem; }
+  .emotion-item { background: var(--tag-bg); padding: 8px; border-radius: 1px; text-align: center; }
+  .emotion-val { font-size: 16px; font-weight: 700; font-family: monospace; }
+  .emotion-lbl { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+  .stress-row { display: flex; align-items: center; gap: 10px; margin-top: 1rem; font-size: 13px; }
+  .stress-bg { flex:1; height: 8px; background: var(--border-md); border-radius: 4px; overflow: hidden; }
+  .stress-fill { height: 100%; border-radius: 4px; transition: width 0.8s ease; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="app-header">
+    <div class="app-tag">NLP × Audio × Vision — 05</div>
+    <div class="app-title">マルチモーダル複合感情・ストレス分析</div>
+    <p class="app-desc">テキスト・音声・表情画像の 3 モダリティを組み合わせ感情・ストレス状態を分析。カウンセリング補助・採用面接・メンタルヘルスなど幅広い用途に対応した汎用設計。</p>
+  </div>
+  <div class="layout">
+    <div>
+      <div class="meta-block">
+        <div class="meta-label">使用技術</div>
+        <div class="tags-wrap">
+          <span class="tag">BERT</span><span class="tag">librosa</span>
+          <span class="tag">OpenCV</span><span class="tag">MeCab</span>
+          <span class="tag">Streamlit</span><span class="tag">reportlab</span>
+        </div>
+      </div>
+      <div class="meta-block">
+        <div class="meta-label">入力モード</div>
+        <div class="meta-body">① テキスト → BERT 感情分析<br>② 音声 → librosa ピッチ・話速解析<br>③ 表情画像 → OpenCV 表情認識</div>
+      </div>
+      <div class="meta-block">
+        <div class="meta-label">⚠️ 免責</div>
+        <div class="meta-body" style="font-size:12px;">AI の判定は参考値であり診断・法的判断の根拠にはなりません。</div>
+      </div>
+    </div>
+    <div>
+      <div class="demo-box">
+        <div class="demo-label">感情分析デモ</div>
+        <div class="mode-tabs">
+          <button class="mode-tab active" onclick="switchMode('text',this)">テキスト</button>
+          <button class="mode-tab" onclick="switchMode('audio',this)">音声</button>
+          <button class="mode-tab" onclick="switchMode('face',this)">表情</button>
+        </div>
+        <div class="input-panel active" id="panel-text">
+          <textarea id="textInput" placeholder="分析したいテキストを入力…">今日は会議が多くて少し疲れました。でも、プロジェクトが前進していて嬉しいです。</textarea>
+          <div style="margin-top:8px;"><button class="btn" onclick="analyze()">分析する</button></div>
+        </div>
+        <div class="input-panel" id="panel-audio">
+          <div style="background:var(--tag-bg);padding:1.5rem;text-align:center;border-radius:1px;font-size:12px;color:var(--text-muted);">
+            🎙️ 音声ファイル (.wav / .mp3) をアップロード<br><br>
+            <button class="btn btn-outline" onclick="analyze()">サンプル音声で分析</button>
+          </div>
+        </div>
+        <div class="input-panel" id="panel-face">
+          <div style="background:var(--tag-bg);padding:1.5rem;text-align:center;border-radius:1px;font-size:12px;color:var(--text-muted);">
+            📷 表情画像をアップロード<br><br>
+            <button class="btn btn-outline" onclick="analyze()">サンプル画像で分析</button>
+          </div>
+        </div>
+        <div id="analysisResult" style="display:none;margin-top:1rem;">
+          <div class="radar-wrap"><canvas id="radarChart" width="160" height="140"></canvas></div>
+          <div class="emotion-grid" id="emotionGrid"></div>
+          <div class="stress-row">
+            <span style="font-size:12px;min-width:72px;">ストレス指数</span>
+            <div class="stress-bg"><div class="stress-fill" id="stressFill" style="width:0%"></div></div>
+            <span id="stressVal" style="font-size:13px;font-weight:700;font-family:monospace;min-width:36px;"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function switchMode(mode, el) {
+  document.querySelectorAll('.mode-tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.input-panel').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('panel-'+mode).classList.add('active');
+  document.getElementById('analysisResult').style.display = 'none';
+}
+
+function analyze() {
+  const emotions = [
+    { label:'喜び',   val: Math.floor(40+Math.random()*40) },
+    { label:'悲しみ', val: Math.floor(5+Math.random()*25)  },
+    { label:'怒り',   val: Math.floor(5+Math.random()*15)  },
+    { label:'不安',   val: Math.floor(10+Math.random()*30) },
+    { label:'驚き',   val: Math.floor(5+Math.random()*20)  },
+    { label:'平静',   val: Math.floor(30+Math.random()*40) }
+  ];
+  const stress = Math.floor(20+Math.random()*50);
+  document.getElementById('analysisResult').style.display = 'block';
+  document.getElementById('emotionGrid').innerHTML = emotions.map(e =>
+    `<div class="emotion-item"><div class="emotion-val">${e.val}%</div><div class="emotion-lbl">${e.label}</div></div>`
+  ).join('');
+  const fill = document.getElementById('stressFill');
+  fill.style.width = '0%';
+  fill.style.background = stress > 60 ? '#c84020' : stress > 40 ? '#c8930a' : '#3aa856';
+  document.getElementById('stressVal').textContent = stress + '%';
+  setTimeout(() => fill.style.width = stress + '%', 50);
+  drawRadar(emotions);
+}
+
+function drawRadar(emotions) {
+  const cv = document.getElementById('radarChart');
+  const ctx = cv.getContext('2d');
+  ctx.clearRect(0,0,160,140);
+  const cx=80, cy=72, r=52, n=emotions.length;
+  const isDark = window.matchMedia('(prefers-color-scheme:dark)').matches;
+  const gridCol = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(28,28,26,0.08)';
+  const fillCol = isDark ? 'rgba(238,237,230,0.15)' : 'rgba(28,28,26,0.12)';
+  const strokeCol = isDark ? 'rgba(238,237,230,0.6)' : 'rgba(28,28,26,0.6)';
+  for(let ring=1;ring<=3;ring++){
+    ctx.beginPath();
+    for(let i=0;i<n;i++){
+      const a=i*(Math.PI*2/n)-Math.PI/2;
+      const x=cx+Math.cos(a)*r*(ring/3), y=cy+Math.sin(a)*r*(ring/3);
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    }
+    ctx.closePath(); ctx.strokeStyle=gridCol; ctx.lineWidth=0.5; ctx.stroke();
+  }
+  ctx.beginPath();
+  emotions.forEach((e,i)=>{
+    const a=i*(Math.PI*2/n)-Math.PI/2, v=e.val/100;
+    const x=cx+Math.cos(a)*r*v, y=cy+Math.sin(a)*r*v;
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.closePath(); ctx.fillStyle=fillCol; ctx.fill();
+  ctx.strokeStyle=strokeCol; ctx.lineWidth=1.5; ctx.stroke();
+  emotions.forEach((e,i)=>{
+    const a=i*(Math.PI*2/n)-Math.PI/2;
+    ctx.fillStyle=isDark?'rgba(238,237,230,0.5)':'rgba(28,28,26,0.4)';
+    ctx.font='9px sans-serif'; ctx.textAlign='center';
+    ctx.fillText(e.label, cx+Math.cos(a)*(r+14), cy+Math.sin(a)*(r+14)+3);
+  });
+}
+</script>
+</body>
+</html>

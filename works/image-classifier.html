@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>商品画像 自動分類アプリ</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="_common.css">
+<style>
+  .upload-zone { border: 1px dashed var(--border-md); border-radius: 2px; padding: 2rem; text-align: center; cursor: pointer; transition: background 0.2s; margin-bottom: 1rem; }
+  .upload-zone:hover { background: var(--tag-bg); }
+  .upload-icon { font-size: 28px; margin-bottom: 8px; opacity: 0.4; }
+  .upload-text { font-size: 12px; color: var(--text-muted); }
+  .sample-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 6px; margin-bottom: 1rem; }
+  .sample-item { aspect-ratio: 1; background: var(--tag-bg); border-radius: 1px; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; border: 1.5px solid transparent; transition: border-color 0.15s; }
+  .sample-item:hover, .sample-item.active { border-color: var(--accent); }
+  .result-area { display: none; }
+  .result-label { font-size: 22px; font-weight: 700; font-family: 'Syne',sans-serif; margin-bottom: 4px; }
+  .result-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 1rem; }
+  .prob-bars { display: flex; flex-direction: column; gap: 8px; }
+  .prob-row { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+  .prob-name { width: 60px; flex-shrink: 0; }
+  .prob-bg { flex: 1; height: 6px; background: var(--border-md); border-radius: 3px; overflow: hidden; }
+  .prob-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width 0.7s ease; }
+  .prob-pct { width: 36px; text-align: right; color: var(--text-muted); }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="app-header">
+    <div class="app-tag">Deep Learning — 03</div>
+    <div class="app-title">商品画像 自動分類アプリ</div>
+    <p class="app-desc">VGG16 転移学習で商品画像を自動分類。画像アップロード → AI 判定 → カテゴリ＋確率表示をDjango で一体化。ディープラーニングを実務直結の Web サービスとして提供。</p>
+  </div>
+  <div class="layout">
+    <div>
+      <div class="meta-block">
+        <div class="meta-label">使用技術</div>
+        <div class="tags-wrap">
+          <span class="tag">Keras</span><span class="tag">TensorFlow</span>
+          <span class="tag">VGG16</span><span class="tag">Django</span><span class="tag">Render</span>
+        </div>
+      </div>
+      <div class="meta-block">
+        <div class="meta-label">主な機能</div>
+        <div class="meta-body">画像アップロード<br>転移学習モデル推論<br>分類結果＋確率表示<br>Top-5 カテゴリ出力</div>
+      </div>
+      <div class="meta-block">
+        <div class="meta-label">アピール点</div>
+        <div class="meta-body">在庫管理アプリと組み合わせ、「写真を撮るだけで在庫登録」に発展可能な設計。</div>
+      </div>
+    </div>
+    <div>
+      <div class="demo-box">
+        <div class="demo-label">サンプル画像を選んで判定</div>
+        <div class="sample-grid">
+          <div class="sample-item" onclick="classify(this,'👟','スニーカー',[[97,'スニーカー'],[2,'ブーツ'],[1,'サンダル']])">👟</div>
+          <div class="sample-item" onclick="classify(this,'🍎','りんご',[[94,'りんご'],[4,'トマト'],[2,'みかん']])">🍎</div>
+          <div class="sample-item" onclick="classify(this,'📱','スマートフォン',[[91,'スマートフォン'],[6,'タブレット'],[3,'カメラ']])">📱</div>
+          <div class="sample-item" onclick="classify(this,'👜','バッグ',[[88,'バッグ'],[8,'財布'],[4,'リュック']])">👜</div>
+        </div>
+        <div class="result-area" id="resultArea">
+          <div class="result-label" id="resultLabel">—</div>
+          <div class="result-sub" id="resultSub">分類結果</div>
+          <div class="prob-bars" id="probBars"></div>
+        </div>
+        <div id="hint" style="font-size:12px;color:var(--text-muted);text-align:center;padding:1rem 0;">↑ 上のサンプルをクリックして判定</div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function classify(el, emoji, label, probs) {
+  document.querySelectorAll('.sample-item').forEach(s=>s.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('hint').style.display = 'none';
+  document.getElementById('resultArea').style.display = 'block';
+  document.getElementById('resultLabel').textContent = emoji + ' ' + label;
+  document.getElementById('resultSub').textContent = `信頼度 ${probs[0][0]}%`;
+  const bars = document.getElementById('probBars');
+  bars.innerHTML = probs.map(([pct,name]) => `
+    <div class="prob-row">
+      <span class="prob-name">${name}</span>
+      <div class="prob-bg"><div class="prob-fill" style="width:0%" data-w="${pct}"></div></div>
+      <span class="prob-pct">${pct}%</span>
+    </div>`).join('');
+  setTimeout(() => {
+    bars.querySelectorAll('.prob-fill').forEach(b => b.style.width = b.dataset.w + '%');
+  }, 50);
+}
+</script>
+</body>
+</html>

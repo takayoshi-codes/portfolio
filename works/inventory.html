@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>在庫・発注管理 Web アプリ</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="_common.css">
+<style>
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); padding: 8px 10px; border-bottom: 0.5px solid var(--border-md); text-align: left; font-weight: 400; }
+  td { padding: 9px 10px; border-bottom: 0.5px solid var(--border); }
+  .badge { font-size: 10px; padding: 2px 8px; border-radius: 1px; }
+  .badge-ok  { background: rgba(40,160,80,0.1);  color: #1a6b35; }
+  .badge-low { background: rgba(220,80,40,0.1);  color: #8b2010; }
+  .badge-mid { background: rgba(200,150,0,0.1);  color: #7a5a00; }
+  tr.highlight td { background: rgba(220,80,40,0.04); }
+  .order-btn { font-size: 10px; padding: 3px 10px; border: 0.5px solid var(--border-md); background: var(--bg); color: var(--text); cursor: pointer; border-radius: 1px; transition: background 0.15s; }
+  .order-btn:hover { background: var(--tag-bg); }
+  .toast { display: none; font-size: 11px; padding: 8px 14px; background: var(--accent); color: var(--bg); border-radius: 1px; margin-top: 10px; letter-spacing: 0.04em; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="app-header">
+    <div class="app-tag">Web App — 01</div>
+    <div class="app-title">在庫・発注管理 Web アプリ</div>
+    <p class="app-desc">商品の在庫数・発注状況をリアルタイムで管理。在庫が閾値を下回ると自動アラートを表示し、発注ボタン一つで履歴を記録。Django + PostgreSQL でフルスクラッチ実装。</p>
+  </div>
+
+  <div class="layout">
+    <div>
+      <div class="meta-block">
+        <div class="meta-label">使用技術</div>
+        <div class="tags-wrap">
+          <span class="tag">Django</span><span class="tag">PostgreSQL</span>
+          <span class="tag">Bootstrap</span><span class="tag">Railway</span>
+        </div>
+      </div>
+      <div class="meta-block">
+        <div class="meta-label">主な機能</div>
+        <div class="meta-body">
+          商品 CRUD・在庫アラート<br>
+          発注履歴・ログイン認証<br>
+          管理画面・DB リレーション設計
+        </div>
+      </div>
+      <div class="meta-block">
+        <div class="meta-label">アピール点</div>
+        <div class="meta-body">DB 設計・認証・デプロイまで一貫実装。実務レベルの Web アプリ構築力を提示。</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="demo-box">
+        <div class="demo-label">在庫一覧デモ</div>
+        <div class="table-wrap">
+          <table id="stockTable">
+            <thead>
+              <tr><th>商品名</th><th>在庫数</th><th>状態</th><th>発注</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>コーヒー豆 A</td><td id="q1">48</td><td><span class="badge badge-ok">適正</span></td><td><button class="order-btn" onclick="order('q1',48)">発注</button></td></tr>
+              <tr class="highlight"><td>ミルク 1L</td><td id="q2">3</td><td><span class="badge badge-low">要発注</span></td><td><button class="order-btn" onclick="order('q2',3)">発注</button></td></tr>
+              <tr><td>砂糖 1kg</td><td id="q3">22</td><td><span class="badge badge-mid">残少</span></td><td><button class="order-btn" onclick="order('q3',22)">発注</button></td></tr>
+              <tr><td>カップ (S)</td><td id="q4">120</td><td><span class="badge badge-ok">適正</span></td><td><button class="order-btn" onclick="order('q4',120)">発注</button></td></tr>
+              <tr class="highlight"><td>蓋 (M)</td><td id="q5">5</td><td><span class="badge badge-low">要発注</span></td><td><button class="order-btn" onclick="order('q5',5)">発注</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="toast" id="toast">✓ 発注を記録しました</div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function order(id, cur) {
+  const el = document.getElementById(id);
+  const add = Math.floor(Math.random()*40)+20;
+  el.textContent = cur + add;
+  const toast = document.getElementById('toast');
+  toast.style.display = 'block';
+  setTimeout(() => toast.style.display = 'none', 2000);
+}
+</script>
+</body>
+</html>

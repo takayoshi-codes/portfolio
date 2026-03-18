@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>競合価格モニタリング＆通知Bot</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="_common.css">
+<style>
+  .price-table { width:100%; border-collapse:collapse; font-size:12px; }
+  .price-table th { font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-muted); padding:8px 10px; border-bottom:0.5px solid var(--border-md); text-align:left; font-weight:400; }
+  .price-table td { padding:9px 10px; border-bottom:0.5px solid var(--border); }
+  .diff-up   { color:#c84020; font-weight:600; }
+  .diff-down { color:#3aa856; font-weight:600; }
+  .diff-same { color:var(--text-muted); }
+  .notify-log { display:flex; flex-direction:column; gap:6px; margin-top:1rem; }
+  .log-item { display:flex; gap:10px; align-items:flex-start; padding:8px 10px; background:var(--tag-bg); border-radius:1px; font-size:12px; }
+  .log-icon { flex-shrink:0; font-size:14px; }
+  .log-body { line-height:1.6; }
+  .log-time { font-size:10px; color:var(--text-muted); }
+  .config-row { display:flex; gap:8px; align-items:center; font-size:12px; flex-wrap:wrap; margin-top:1rem; }
+  .config-select { border:0.5px solid var(--border-md); background:var(--bg); color:var(--text); padding:5px 10px; font-size:12px; border-radius:1px; font-family:inherit; }
+  .badge-alert { font-size:10px; padding:2px 8px; background:rgba(220,80,40,0.1); color:#8b2010; border-radius:1px; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="app-header">
+    <div class="app-tag">Business Automation — 08</div>
+    <div class="app-title">競合価格モニタリング＆通知 Bot</div>
+    <p class="app-desc">EC サイトの競合商品価格を定期スクレイピングし、変動があれば Slack またはメールで自動通知。GitHub Actions で Cron 実行し常時監視を無人化。config.yaml 一行で通知先を切替可能。</p>
+  </div>
+  <div class="layout">
+    <div>
+      <div class="meta-block">
+        <div class="meta-label">使用技術</div>
+        <div class="tags-wrap">
+          <span class="tag">BeautifulSoup</span><span class="tag">SQLite</span>
+          <span class="tag">Slack Webhook</span><span class="tag">Gmail API</span>
+          <span class="tag">GitHub Actions</span>
+        </div>
+      </div>
+      <div class="meta-block">
+        <div class="meta-label">切替設計</div>
+        <div class="meta-body" style="font-family:monospace;font-size:12px;background:var(--tag-bg);padding:8px 10px;border-radius:1px;">
+          NOTIFY_TYPE: slack<br>
+          <span style="color:var(--text-muted)"># または email</span>
+        </div>
+      </div>
+      <div class="meta-block">
+        <div class="meta-label">主な機能</div>
+        <div class="meta-body">価格取得・差分検知<br>Slack ／ メール通知<br>履歴 DB 保存<br>日次サマリーレポート</div>
+      </div>
+    </div>
+    <div>
+      <div class="demo-box">
+        <div class="demo-label">価格モニタリングデモ</div>
+        <div class="config-row">
+          <span>通知先:</span>
+          <select class="config-select" id="notifyType">
+            <option value="slack">Slack</option>
+            <option value="email">メール</option>
+          </select>
+          <button class="btn btn-outline" style="padding:5px 14px;" onclick="runCheck()">今すぐ確認</button>
+        </div>
+        <div class="divider"></div>
+        <table class="price-table">
+          <thead><tr><th>商品</th><th>前回</th><th>現在</th><th>変動</th></tr></thead>
+          <tbody id="priceBody"></tbody>
+        </table>
+        <div class="notify-log" id="notifyLog"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+const products = [
+  { name:'ワイヤレスイヤホン A', prev:8980, cur:7980 },
+  { name:'モバイルバッテリー B', prev:4480, cur:4980 },
+  { name:'USB-C ハブ C',        prev:3280, cur:3280 },
+  { name:'スマートウォッチ D',  prev:32800,cur:29800 },
+];
+
+function fmt(n){ return n.toLocaleString()+'円'; }
+
+function runCheck() {
+  const tbody = document.getElementById('priceBody');
+  tbody.innerHTML = products.map(p => {
+    const diff = p.cur - p.prev;
+    const cls  = diff < 0 ? 'diff-down' : diff > 0 ? 'diff-up' : 'diff-same';
+    const sign = diff < 0 ? '▼' : diff > 0 ? '▲' : '—';
+    const val  = diff !== 0 ? sign+' '+Math.abs(diff).toLocaleString()+'円' : sign;
+    return `<tr><td>${p.name}</td><td>${fmt(p.prev)}</td><td>${fmt(p.cur)}</td><td class="${cls}">${val}</td></tr>`;
+  }).join('');
+
+  const alerts = products.filter(p=>p.cur!==p.prev);
+  const type = document.getElementById('notifyType').value;
+  const icon = type==='slack' ? '💬' : '📧';
+  const dest = type==='slack' ? '#price-alert チャンネル' : 'your@email.com';
+  const log = document.getElementById('notifyLog');
+  log.innerHTML = '';
+  if(alerts.length > 0){
+    alerts.forEach(p=>{
+      const diff = p.cur-p.prev;
+      const dir = diff<0?'値下がり':'値上がり';
+      log.innerHTML += `<div class="log-item"><span class="log-icon">${icon}</span><div class="log-body"><span class="badge-alert">ALERT</span> ${p.name} が ${dir}（${fmt(p.prev)} → ${fmt(p.cur)}）<br><span class="log-time">通知先: ${dest} — 送信完了</span></div></div>`;
+    });
+  } else {
+    log.innerHTML = `<div class="log-item"><span class="log-icon">✓</span><div class="log-body">変動なし。次回確認は 1 時間後です。</div></div>`;
+  }
+}
+window.addEventListener('load', runCheck);
+</script>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>植物診断＆ケアアドバイスアプリ</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="_common.css">
+<style>
+  .plant-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; margin-bottom: 1rem; }
+  .plant-item { border: 1.5px solid transparent; border-radius: 2px; padding: 10px 6px; text-align: center; cursor: pointer; background: var(--tag-bg); transition: border-color 0.15s; }
+  .plant-item:hover, .plant-item.active { border-color: var(--accent); }
+  .plant-emoji { font-size: 26px; display: block; margin-bottom: 4px; }
+  .plant-name { font-size: 11px; color: var(--text-muted); }
+  .health-bar-wrap { margin: 1rem 0; }
+  .health-label { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; }
+  .health-bg { height: 6px; background: var(--border-md); border-radius: 3px; overflow: hidden; }
+  .health-fill { height: 100%; border-radius: 3px; transition: width 0.8s ease; }
+  .advice-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .advice-item { font-size: 12px; display: flex; gap: 8px; align-items: flex-start; line-height: 1.6; }
+  .advice-icon { flex-shrink: 0; font-size: 14px; }
+  .status-badge { display: inline-block; font-size: 10px; padding: 2px 10px; border-radius: 1px; margin-bottom: 8px; }
+  .status-good { background: rgba(40,160,80,0.12); color: #1a6b35; }
+  .status-warn { background: rgba(220,150,0,0.12); color: #7a5a00; }
+  .status-bad  { background: rgba(220,80,40,0.12);  color: #8b2010; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="app-header">
+    <div class="app-tag">AI × Web — 04</div>
+    <div class="app-title">植物診断＆ケアアドバイスアプリ</div>
+    <p class="app-desc">植物の写真をアップロードすると、AI が種類・病気・健康状態を判定し水やり・肥料のタイミングをアドバイス。生育記録を DB に蓄積し、Slack で水やり通知も配信。</p>
+  </div>
+  <div class="layout">
+    <div>
+      <div class="meta-block">
+        <div class="meta-label">使用技術</div>
+        <div class="tags-wrap">
+          <span class="tag">VGG16</span><span class="tag">BERT</span>
+          <span class="tag">Django</span><span class="tag">PostgreSQL</span>
+          <span class="tag">Slack Webhook</span><span class="tag">GitHub Actions</span>
+        </div>
+      </div>
+      <div class="meta-block">
+        <div class="meta-label">学習データ</div>
+        <div class="meta-body">PlantVillage Dataset<br>54,000枚・38種・病気ラベル付き</div>
+      </div>
+      <div class="meta-block">
+        <div class="meta-label">主な機能</div>
+        <div class="meta-body">植物種＋病気判定<br>健康スコア表示<br>ケアアドバイス生成<br>生育記録グラフ<br>Slack 水やり通知</div>
+      </div>
+    </div>
+    <div>
+      <div class="demo-box">
+        <div class="demo-label">植物を選んで診断</div>
+        <div class="plant-grid">
+          <div class="plant-item" onclick="diagnose(this,'トマト','good',92,'水やり不要・日照十分','good')">
+            <span class="plant-emoji">🍅</span><span class="plant-name">トマト</span>
+          </div>
+          <div class="plant-item" onclick="diagnose(this,'バラ','warn',58,'葉に黄変あり・肥料不足の可能性','warn')">
+            <span class="plant-emoji">🌹</span><span class="plant-name">バラ</span>
+          </div>
+          <div class="plant-item" onclick="diagnose(this,'多肉植物','good',85,'水やり少量・乾燥気味を維持','good')">
+            <span class="plant-emoji">🌵</span><span class="plant-name">多肉植物</span>
+          </div>
+          <div class="plant-item" onclick="diagnose(this,'バジル','bad',31,'根腐れの疑い・水はけ確認を','bad')">
+            <span class="plant-emoji">🌿</span><span class="plant-name">バジル</span>
+          </div>
+          <div class="plant-item" onclick="diagnose(this,'ひまわり','good',88,'順調・追肥タイミング近い','good')">
+            <span class="plant-emoji">🌻</span><span class="plant-name">ひまわり</span>
+          </div>
+          <div class="plant-item" onclick="diagnose(this,'観葉植物','warn',65,'葉先が茶色・乾燥対策を','warn')">
+            <span class="plant-emoji">🌱</span><span class="plant-name">観葉植物</span>
+          </div>
+        </div>
+        <div id="diagResult" style="display:none;">
+          <div class="status-badge" id="statusBadge"></div>
+          <div class="health-bar-wrap">
+            <div class="health-label"><span>健康スコア</span><span id="scoreVal">—</span></div>
+            <div class="health-bg"><div class="health-fill" id="healthFill" style="width:0%"></div></div>
+          </div>
+          <ul class="advice-list" id="adviceList"></ul>
+        </div>
+        <div id="plantHint" style="font-size:12px;color:var(--text-muted);text-align:center;padding:1rem 0;">↑ 植物を選んで診断</div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+const adviceMap = {
+  good: [['💧','水やりは3日後が目安です'],['☀️','日照条件は良好です'],['📊','生育記録を更新しました']],
+  warn: [['⚠️','葉の状態を要観察'],['🌿','窒素系肥料の追加を検討'],['💧','水やりを1日おきに増やして']],
+  bad:  [['🚨','早急な対処が必要です'],['🪣','土の水はけを改善してください'],['🔬','根の状態を確認してください']]
+};
+const colors = { good:'#3aa856', warn:'#c8930a', bad:'#c84020' };
+const statusLabels = { good:'✓ 健康', warn:'⚠ 要注意', bad:'✕ 危険' };
+const statusClasses = { good:'status-good', warn:'status-warn', bad:'status-bad' };
+
+function diagnose(el, name, status, score, summary, level) {
+  document.querySelectorAll('.plant-item').forEach(s=>s.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('plantHint').style.display = 'none';
+  document.getElementById('diagResult').style.display = 'block';
+  const badge = document.getElementById('statusBadge');
+  badge.textContent = name + ' — ' + statusLabels[level];
+  badge.className = 'status-badge ' + statusClasses[level];
+  document.getElementById('scoreVal').textContent = score + '%';
+  const fill = document.getElementById('healthFill');
+  fill.style.width = '0%';
+  fill.style.background = colors[level];
+  setTimeout(() => fill.style.width = score + '%', 50);
+  document.getElementById('adviceList').innerHTML = adviceMap[level].map(([icon,text]) =>
+    `<li class="advice-item"><span class="advice-icon">${icon}</span><span>${text}</span></li>`
+  ).join('');
+}
+</script>
+</body>
+</html>

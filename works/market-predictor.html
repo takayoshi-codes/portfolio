@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>マルチ資産リアルタイム予測ダッシュボード</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="_common.css">
+<style>
+  .asset-tabs { display: flex; gap: 6px; margin-bottom: 1rem; }
+  .asset-tab { font-size: 11px; padding: 5px 14px; border: 0.5px solid var(--border-md); background: var(--bg); color: var(--text-muted); cursor: pointer; border-radius: 1px; transition: all 0.15s; }
+  .asset-tab.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+  .chart-area { height: 130px; position: relative; margin-bottom: 1rem; }
+  canvas#priceChart { width: 100%; height: 100%; }
+  .score-row { display: flex; gap: 12px; margin-top: 8px; }
+  .score-item { flex: 1; background: var(--tag-bg); padding: 10px; border-radius: 1px; text-align: center; }
+  .score-val { font-size: 18px; font-weight: 700; font-family: monospace; }
+  .score-lbl { font-size: 10px; color: var(--text-muted); letter-spacing: 0.08em; margin-top: 2px; }
+  .model-row { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
+  .model-btn { font-size: 10px; padding: 4px 12px; border: 0.5px solid var(--border-md); background: var(--bg); color: var(--text-muted); cursor: pointer; border-radius: 1px; transition: all 0.15s; }
+  .model-btn.active { background: var(--tag-bg); color: var(--text); border-color: var(--border-md); }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="app-header">
+    <div class="app-tag">ML / Dashboard — 02</div>
+    <div class="app-title">マルチ資産リアルタイム予測ダッシュボード</div>
+    <p class="app-desc">株価・為替・仮想通貨をリアルタイム API で取得し、LSTM・RandomForest・XGBoost で予測＆精度比較。「予測精度を売る」のでなく「分析プロセスを構築できるエンジニア」として見せる設計。</p>
+  </div>
+  <div class="layout">
+    <div>
+      <div class="meta-block">
+        <div class="meta-label">使用技術</div>
+        <div class="tags-wrap">
+          <span class="tag">LSTM / Keras</span><span class="tag">scikit-learn</span>
+          <span class="tag">XGBoost</span><span class="tag">pandas</span>
+          <span class="tag">Streamlit</span><span class="tag">Yahoo Finance API</span>
+        </div>
+      </div>
+      <div class="meta-block">
+        <div class="meta-label">主な機能</div>
+        <div class="meta-body">資産切替・期間選択<br>モデル比較グラフ<br>MAE / RMSE スコア表示<br>予測ライン描画</div>
+      </div>
+      <div class="meta-block">
+        <div class="meta-label">⚠️ 免責</div>
+        <div class="meta-body" style="font-size:12px;">投資助言ではなく学習目的のデモです。</div>
+      </div>
+    </div>
+    <div>
+      <div class="demo-box">
+        <div class="demo-label">予測デモ</div>
+        <div class="asset-tabs">
+          <button class="asset-tab active" onclick="switchAsset('stock',this)">株価</button>
+          <button class="asset-tab" onclick="switchAsset('fx',this)">為替</button>
+          <button class="asset-tab" onclick="switchAsset('crypto',this)">仮想通貨</button>
+        </div>
+        <div class="model-row">
+          <button class="model-btn active" onclick="switchModel('LSTM',this)">LSTM</button>
+          <button class="model-btn" onclick="switchModel('RandomForest',this)">RandomForest</button>
+          <button class="model-btn" onclick="switchModel('XGBoost',this)">XGBoost</button>
+        </div>
+        <div class="chart-area"><canvas id="priceChart"></canvas></div>
+        <div class="score-row">
+          <div class="score-item"><div class="score-val" id="maeVal">2.34</div><div class="score-lbl">MAE</div></div>
+          <div class="score-item"><div class="score-val" id="rmseVal">3.12</div><div class="score-lbl">RMSE</div></div>
+          <div class="score-item"><div class="score-val" id="modelName">LSTM</div><div class="score-lbl">Model</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+const datasets = {
+  stock:  [142,145,143,148,150,147,152,155,153,158,156,161,159,164,162],
+  fx:     [149.2,149.8,150.1,149.5,150.4,151.0,150.7,151.5,152.0,151.3,152.8,153.2,152.5,153.8,154.1],
+  crypto: [42000,41500,43000,42800,44000,43500,45000,44500,46000,45500,47000,46500,48000,47500,49000]
+};
+const scores = {
+  LSTM: { mae:'2.34', rmse:'3.12' },
+  RandomForest: { mae:'3.81', rmse:'5.04' },
+  XGBoost: { mae:'2.97', rmse:'3.88' }
+};
+let currentAsset = 'stock', currentModel = 'LSTM';
+
+function drawChart() {
+  const cv = document.getElementById('priceChart');
+  const dpr = window.devicePixelRatio || 1;
+  const rect = cv.parentElement.getBoundingClientRect();
+  cv.width = rect.width * dpr; cv.height = rect.height * dpr;
+  cv.style.width = rect.width + 'px'; cv.style.height = rect.height + 'px';
+  const ctx = cv.getContext('2d'); ctx.scale(dpr, dpr);
+  const w = rect.width, h = rect.height;
+  const data = datasets[currentAsset];
+  const min = Math.min(...data)*0.995, max = Math.max(...data)*1.005;
+  const toY = v => h*0.1 + (1-(v-min)/(max-min))*h*0.75;
+  const toX = (i,len) => w*0.05 + i*(w*0.9/(len-1));
+
+  // grid
+  ctx.strokeStyle = 'rgba(28,28,26,0.07)'; ctx.lineWidth = 0.5;
+  for(let i=0;i<4;i++) { const y=h*0.1+i*h*0.25; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
+
+  // actual line
+  ctx.beginPath();
+  data.slice(0,10).forEach((v,i) => i===0?ctx.moveTo(toX(i,data.length),toY(v)):ctx.lineTo(toX(i,data.length),toY(v)));
+  ctx.strokeStyle='rgba(28,28,26,0.5)'; ctx.lineWidth=1.5; ctx.lineJoin='round'; ctx.stroke();
+
+  // predicted (dashed)
+  ctx.setLineDash([4,3]);
+  ctx.beginPath();
+  data.slice(9).forEach((v,i) => {
+    const xi = toX(i+9,data.length), yi = toY(v*(1+(Math.random()-0.5)*0.006));
+    i===0?ctx.moveTo(xi,yi):ctx.lineTo(xi,yi);
+  });
+  ctx.strokeStyle='rgba(28,28,26,0.3)'; ctx.lineWidth=1.5; ctx.stroke();
+  ctx.setLineDash([]);
+
+  // split line
+  ctx.beginPath(); ctx.moveTo(toX(9,data.length),h*0.05); ctx.lineTo(toX(9,data.length),h*0.9);
+  ctx.strokeStyle='rgba(28,28,26,0.15)'; ctx.lineWidth=0.5; ctx.setLineDash([3,3]); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='rgba(28,28,26,0.4)'; ctx.font='9px monospace';
+  ctx.fillText('予測→', toX(9,data.length)+4, h*0.12);
+}
+
+function switchAsset(asset, el) {
+  currentAsset = asset;
+  document.querySelectorAll('.asset-tab').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active'); drawChart();
+}
+function switchModel(model, el) {
+  currentModel = model;
+  document.querySelectorAll('.model-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('maeVal').textContent = scores[model].mae;
+  document.getElementById('rmseVal').textContent = scores[model].rmse;
+  document.getElementById('modelName').textContent = model;
+  drawChart();
+}
+window.addEventListener('load', drawChart);
+window.addEventListener('resize', drawChart);
+</script>
+</body>
+</html>
