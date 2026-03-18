@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Stack</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f8f9fa;
+    --surface: #ffffff;
+    --border: #e5e7eb;
+    --text: #111827;
+    --text-muted: #6b7280;
+    --accent: #2563eb;
+    --radius: 12px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; padding: 40px 24px 80px; }
+  .container { max-width: 860px; margin: 0 auto; }
+
+  .profile { display: flex; align-items: center; gap: 16px; margin-bottom: 32px; }
+  .avatar { width: 64px; height: 64px; border-radius: 14px; background: linear-gradient(135deg, #2563eb, #7c3aed); display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; flex-shrink: 0; }
+  .profile-info h1 { font-size: 26px; font-weight: 600; }
+  .profile-info p { font-size: 13px; color: var(--text-muted); margin-top: 4px; line-height: 1.6; }
+  .meta { display: flex; gap: 16px; margin-top: 8px; flex-wrap: wrap; }
+  .meta-item { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
+
+  .section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 16px; overflow: hidden; }
+  .section-header { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .section-title { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .section-count { font-size: 12px; color: var(--text-muted); background: var(--bg); border: 1px solid var(--border); padding: 2px 10px; border-radius: 20px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 2px; padding: 16px; }
+  .tool { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px 8px; border-radius: 10px; cursor: pointer; transition: background .15s; text-decoration: none; color: inherit; }
+  .tool:hover { background: var(--bg); }
+  .tool-icon { width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 26px; overflow: hidden; }
+  .tool-icon img { width: 100%; height: 100%; object-fit: contain; }
+  .tool-name { font-size: 11px; color: var(--text-muted); text-align: center; line-height: 1.3; }
+
+  /* icon bg colors */
+  .ic-aws    { background: #FF9900; }
+  .ic-azure  { background: #0089D6; }
+  .ic-gcp    { background: #4285F4; }
+  .ic-docker { background: #2496ED; }
+  .ic-py     { background: #3776AB; }
+  .ic-dj     { background: #092E20; }
+  .ic-go     { background: #00ACD7; }
+  .ic-js     { background: #F7DF1E; }
+  .ic-html   { background: #E34F26; }
+  .ic-css    { background: #1572B6; }
+  .ic-vue    { background: #4FC08D; }
+  .ic-nuxt   { background: #00C58E; }
+  .ic-linux  { background: #FCC624; }
+  .ic-nginx  { background: #009639; }
+  .ic-wp     { background: #21759B; }
+  .ic-bs     { background: #7952B3; }
+  .ic-pg     { background: #336791; }
+  .ic-mysql  { background: #4479A1; }
+  .ic-sqlite { background: #003B57; }
+  .ic-tf     { background: #FF6F00; }
+  .ic-keras  { background: #D00000; }
+  .ic-sk     { background: #F7931E; }
+  .ic-pd     { background: #150458; }
+  .ic-np     { background: #013243; }
+  .ic-cv     { background: #5C3EE8; }
+  .ic-hf     { background: #FFD21E; }
+  .ic-git    { background: #F05032; }
+  .ic-github { background: #181717; }
+  .ic-gitlab { background: #FC6D26; }
+  .ic-circle { background: #343434; }
+  .ic-vim    { background: #019733; }
+  .ic-tf2    { background: #7B42BC; }
+  .ic-se     { background: #43B02A; }
+  .ic-az     { background: #0078D4; }
+  .ic-sl     { background: #4A154B; }
+  .ic-ga     { background: #E37400; }
+  .ic-st     { background: #FF4B4B; }
+  .ic-ry     { background: #0062CC; }
+  .ic-gmail  { background: #EA4335; }
+  .ic-lm     { background: #FCC624; }
+  .ic-lr     { background: #8B0000; }
+  .ic-mecab  { background: #00B16A; }
+  .ic-w2v    { background: #555555; }
+  .ic-xl     { background: #217346; }
+  .ic-rl     { background: #8B4513; }
+  .ic-vagrant { background: #1563FF; }
+  .ic-vb     { background: #183A61; }
+  .ic-bulma  { background: #00D1B2; }
+  .ic-vuex   { background: #4FC08D; }
+  .ic-sr     { background: #0066CC; }
+  .ic-jq     { background: #0769AD; }
+  .ic-amz    { background: #FF9900; }
+  .ic-gh2    { background: #2088FF; }
+  .ic-gha    { background: #2088FF; }
+  .ic-bq     { background: #4285F4; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="profile">
+    <div class="avatar">🛠</div>
+    <div class="profile-info">
+      <h1>My Stack</h1>
+      <p>実務・ポートフォリオで使用している技術スタック一覧<br>The skills used in actual work and portfolio projects.</p>
+      <div class="meta">
+        <span class="meta-item">🔧 60 tools</span>
+        <span class="meta-item">📅 2025</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application & Data -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">☁️ Application & Data</span>
+      <span class="section-count">37</span>
+    </div>
+    <div class="grid">
+      <!-- 既存スタック -->
+      <div class="tool"><div class="tool-icon ic-aws"><img src="https://cdn.simpleicons.org/amazonaws/white" alt=""></div><span class="tool-name">Amazon EC2</span></div>
+      <div class="tool"><div class="tool-icon ic-aws"><img src="https://cdn.simpleicons.org/amazons3/white" alt=""></div><span class="tool-name">Amazon S3</span></div>
+      <div class="tool"><div class="tool-icon ic-aws"><img src="https://cdn.simpleicons.org/amazonaws/white" alt=""></div><span class="tool-name">Route 53</span></div>
+      <div class="tool"><div class="tool-icon ic-aws"><img src="https://cdn.simpleicons.org/amazonaws/white" alt=""></div><span class="tool-name">Amazon RDS</span></div>
+      <div class="tool"><div class="tool-icon ic-aws"><img src="https://cdn.simpleicons.org/awslambda/white" alt=""></div><span class="tool-name">AWS Lambda</span></div>
+      <div class="tool"><div class="tool-icon ic-aws"><img src="https://cdn.simpleicons.org/amazonlinux/white" alt=""></div><span class="tool-name">Amazon Linux</span></div>
+      <div class="tool"><div class="tool-icon ic-azure"><img src="https://cdn.simpleicons.org/microsoftazure/white" alt=""></div><span class="tool-name">Azure</span></div>
+      <div class="tool"><div class="tool-icon ic-gcp" style="background:#4285F4"><img src="https://cdn.simpleicons.org/googlebigquery/white" alt=""></div><span class="tool-name">BigQuery</span></div>
+      <div class="tool"><div class="tool-icon ic-docker"><img src="https://cdn.simpleicons.org/docker/white" alt=""></div><span class="tool-name">Docker</span></div>
+      <div class="tool"><div class="tool-icon ic-docker"><img src="https://cdn.simpleicons.org/docker/white" alt=""></div><span class="tool-name">Docker Compose</span></div>
+      <div class="tool"><div class="tool-icon ic-wp"><img src="https://cdn.simpleicons.org/wordpress/white" alt=""></div><span class="tool-name">WordPress</span></div>
+      <div class="tool"><div class="tool-icon ic-nginx"><img src="https://cdn.simpleicons.org/nginx/white" alt=""></div><span class="tool-name">NGINX</span></div>
+      <div class="tool"><div class="tool-icon ic-py"><img src="https://cdn.simpleicons.org/python/white" alt=""></div><span class="tool-name">Python</span></div>
+      <div class="tool"><div class="tool-icon ic-dj"><img src="https://cdn.simpleicons.org/django/white" alt=""></div><span class="tool-name">Django</span></div>
+      <div class="tool"><div class="tool-icon ic-go"><img src="https://cdn.simpleicons.org/go/white" alt=""></div><span class="tool-name">Golang</span></div>
+      <div class="tool"><div class="tool-icon ic-js"><img src="https://cdn.simpleicons.org/javascript/black" alt=""></div><span class="tool-name">JavaScript</span></div>
+      <div class="tool"><div class="tool-icon ic-html"><img src="https://cdn.simpleicons.org/html5/white" alt=""></div><span class="tool-name">HTML5</span></div>
+      <div class="tool"><div class="tool-icon ic-vue"><img src="https://cdn.simpleicons.org/vuedotjs/white" alt=""></div><span class="tool-name">Vue.js</span></div>
+      <div class="tool"><div class="tool-icon ic-nuxt"><img src="https://cdn.simpleicons.org/nuxtdotjs/white" alt=""></div><span class="tool-name">Nuxt.js</span></div>
+      <div class="tool"><div class="tool-icon ic-bs"><img src="https://cdn.simpleicons.org/bootstrap/white" alt=""></div><span class="tool-name">Bootstrap</span></div>
+      <div class="tool"><div class="tool-icon ic-bulma"><img src="https://cdn.simpleicons.org/bulma/white" alt=""></div><span class="tool-name">Bulma</span></div>
+      <div class="tool"><div class="tool-icon ic-css"><img src="https://cdn.simpleicons.org/css3/white" alt=""></div><span class="tool-name">CSS3</span></div>
+      <div class="tool"><div class="tool-icon ic-pg"><img src="https://cdn.simpleicons.org/postgresql/white" alt=""></div><span class="tool-name">PostgreSQL</span></div>
+      <div class="tool"><div class="tool-icon ic-mysql"><img src="https://cdn.simpleicons.org/mysql/white" alt=""></div><span class="tool-name">MySQL</span></div>
+      <div class="tool"><div class="tool-icon ic-sqlite"><img src="https://cdn.simpleicons.org/sqlite/white" alt=""></div><span class="tool-name">SQLite</span></div>
+      <div class="tool"><div class="tool-icon ic-linux" style="color:#333"><img src="https://cdn.simpleicons.org/linux/black" alt=""></div><span class="tool-name">Ubuntu/Linux</span></div>
+      <div class="tool"><div class="tool-icon ic-vagrant"><img src="https://cdn.simpleicons.org/vagrant/white" alt=""></div><span class="tool-name">Vagrant</span></div>
+      <div class="tool"><div class="tool-icon ic-vb"><img src="https://cdn.simpleicons.org/virtualbox/white" alt=""></div><span class="tool-name">VirtualBox</span></div>
+      <!-- ポートフォリオ追加 -->
+      <div class="tool"><div class="tool-icon ic-tf"><img src="https://cdn.simpleicons.org/tensorflow/white" alt=""></div><span class="tool-name">TensorFlow</span></div>
+      <div class="tool"><div class="tool-icon ic-keras"><img src="https://cdn.simpleicons.org/keras/white" alt=""></div><span class="tool-name">Keras</span></div>
+      <div class="tool"><div class="tool-icon ic-sk"><img src="https://cdn.simpleicons.org/scikitlearn/white" alt=""></div><span class="tool-name">scikit-learn</span></div>
+      <div class="tool"><div class="tool-icon ic-pd"><img src="https://cdn.simpleicons.org/pandas/white" alt=""></div><span class="tool-name">pandas</span></div>
+      <div class="tool"><div class="tool-icon ic-np"><img src="https://cdn.simpleicons.org/numpy/white" alt=""></div><span class="tool-name">NumPy</span></div>
+      <div class="tool"><div class="tool-icon ic-cv"><img src="https://cdn.simpleicons.org/opencv/white" alt=""></div><span class="tool-name">OpenCV</span></div>
+      <div class="tool"><div class="tool-icon ic-hf" style="color:#333"><img src="https://cdn.simpleicons.org/huggingface/black" alt=""></div><span class="tool-name">HuggingFace</span></div>
+      <div class="tool"><div class="tool-icon ic-st"><img src="https://cdn.simpleicons.org/streamlit/white" alt=""></div><span class="tool-name">Streamlit</span></div>
+      <div class="tool"><div class="tool-icon ic-ry"><img src="https://cdn.simpleicons.org/railway/white" alt=""></div><span class="tool-name">Railway</span></div>
+    </div>
+  </div>
+
+  <!-- AI / NLP -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">🤖 AI / ML / NLP</span>
+      <span class="section-count">7</span>
+    </div>
+    <div class="grid">
+      <div class="tool"><div class="tool-icon" style="background:#f59e0b; font-size:20px; font-weight:700; color:white;">B</div><span class="tool-name">BERT</span></div>
+      <div class="tool"><div class="tool-icon" style="background:#6366f1; font-size:20px; font-weight:700; color:white;">G2</div><span class="tool-name">GPT-2</span></div>
+      <div class="tool"><div class="tool-icon" style="background:#555; font-size:16px; font-weight:700; color:white;">W2V</div><span class="tool-name">Word2Vec</span></div>
+      <div class="tool"><div class="tool-icon" style="background:#8B0000; font-size:16px; font-weight:700; color:white;">♪</div><span class="tool-name">librosa</span></div>
+      <div class="tool"><div class="tool-icon" style="background:#00B16A; font-size:16px; font-weight:700; color:white;">形</div><span class="tool-name">MeCab</span></div>
+      <div class="tool"><div class="tool-icon" style="background:#09A3D5; font-size:16px; font-weight:700; color:white;">sp</div><span class="tool-name">spaCy</span></div>
+      <div class="tool"><div class="tool-icon" style="background:#217346; font-size:16px; font-weight:700; color:white;">xl</div><span class="tool-name">openpyxl</span></div>
+    </div>
+  </div>
+
+  <!-- Utilities -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">⚙️ Utilities</span>
+      <span class="section-count">5</span>
+    </div>
+    <div class="grid">
+      <div class="tool"><div class="tool-icon ic-ga"><img src="https://cdn.simpleicons.org/googleanalytics/white" alt=""></div><span class="tool-name">Google Analytics</span></div>
+      <div class="tool"><div class="tool-icon ic-sl"><img src="https://cdn.simpleicons.org/slack/white" alt=""></div><span class="tool-name">Slack API</span></div>
+      <div class="tool"><div class="tool-icon ic-gmail"><img src="https://cdn.simpleicons.org/gmail/white" alt=""></div><span class="tool-name">Gmail API</span></div>
+      <div class="tool"><div class="tool-icon" style="background:#0078D4"><img src="https://cdn.simpleicons.org/microsoftazure/white" alt=""></div><span class="tool-name">AWS IAM</span></div>
+      <div class="tool"><div class="tool-icon" style="background:#8B4513; font-size:16px; font-weight:700; color:white;">PDF</div><span class="tool-name">reportlab</span></div>
+    </div>
+  </div>
+
+  <!-- DevOps -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">🚀 DevOps</span>
+      <span class="section-count">10</span>
+    </div>
+    <div class="grid">
+      <div class="tool"><div class="tool-icon ic-git"><img src="https://cdn.simpleicons.org/git/white" alt=""></div><span class="tool-name">Git</span></div>
+      <div class="tool"><div class="tool-icon ic-github"><img src="https://cdn.simpleicons.org/github/white" alt=""></div><span class="tool-name">GitHub</span></div>
+      <div class="tool"><div class="tool-icon ic-gha"><img src="https://cdn.simpleicons.org/githubactions/white" alt=""></div><span class="tool-name">GitHub Actions</span></div>
+      <div class="tool"><div class="tool-icon ic-gitlab"><img src="https://cdn.simpleicons.org/gitlab/white" alt=""></div><span class="tool-name">GitLab</span></div>
+      <div class="tool"><div class="tool-icon ic-circle"><img src="https://cdn.simpleicons.org/circleci/white" alt=""></div><span class="tool-name">CircleCI</span></div>
+      <div class="tool"><div class="tool-icon ic-vim"><img src="https://cdn.simpleicons.org/vim/white" alt=""></div><span class="tool-name">Vim</span></div>
+      <div class="tool"><div class="tool-icon ic-tf2"><img src="https://cdn.simpleicons.org/terraform/white" alt=""></div><span class="tool-name">Terraform</span></div>
+      <div class="tool"><div class="tool-icon ic-se"><img src="https://cdn.simpleicons.org/selenium/white" alt=""></div><span class="tool-name">Selenium</span></div>
+      <div class="tool"><div class="tool-icon" style="background:#0078D4"><img src="https://cdn.simpleicons.org/microsoftazure/white" alt=""></div><span class="tool-name">Azure Pipelines</span></div>
+      <div class="tool"><div class="tool-icon" style="background:#0078D4"><img src="https://cdn.simpleicons.org/microsoftazure/white" alt=""></div><span class="tool-name">Azure DevOps</span></div>
+    </div>
+  </div>
+
+  <!-- Business Tools -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">💼 Business Tools</span>
+      <span class="section-count">4</span>
+    </div>
+    <div class="grid">
+      <div class="tool"><div class="tool-icon ic-jq"><img src="https://cdn.simpleicons.org/jquery/white" alt=""></div><span class="tool-name">jQuery</span></div>
+      <div class="tool"><div class="tool-icon ic-vue"><img src="https://cdn.simpleicons.org/vuedotjs/white" alt=""></div><span class="tool-name">Vuex</span></div>
+      <div class="tool"><div class="tool-icon ic-vue"><img src="https://cdn.simpleicons.org/vuedotjs/white" alt=""></div><span class="tool-name">Vue Router</span></div>
+      <div class="tool"><div class="tool-icon ic-vue"><img src="https://cdn.simpleicons.org/vuedotjs/white" alt=""></div><span class="tool-name">Vue CLI</span></div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
