@@ -747,7 +747,7 @@
           <div class="cf-field">
             <label class="cf-label" for="cf-email">メールアドレス <span class="required">*必須</span></label>
             <input class="cf-input" id="cf-email" name="email" type="email" placeholder="example@email.com" required>
-            <span class="cf-error" id="cf-email-error">有効なメールアドレスを入力してください（例：<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="9df8e5fcf0edf1f8ddf8f0fcf4f1b3fef2f0">[email&#160;protected]</a>）</span>
+            <span class="cf-error" id="cf-email-error">有効なメールアドレスを入力してください（例：example@email.com）</span>
           </div>
           <div class="cf-row">
             <div class="cf-field">
@@ -1724,4 +1724,14 @@
     const skillObs = new IntersectionObserver(entries => {
       entries.forEach(e => {
         if (e.isIntersecting) {
-          e.target.querySelectorAll('.skill-bar').forEach
+          e.target.querySelectorAll('.skill-bar').forEach(bar => {
+            bar.style.width = bar.dataset.w + '%';
+          });
+        }
+      });
+    }, { threshold: 0.2 });
+    document.querySelectorAll('#skills').forEach(s => skillObs.observe(s));
+
+  </script>
+</body>
+</html>
