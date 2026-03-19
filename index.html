@@ -731,7 +731,9 @@
       </div>
       <div id="cfForm">
         <form id="contactForm">
-          <input type="hidden" name="_subject" value="【ポートフォリオ】お問い合わせ">
+          <input type="hidden" name="access_key" value="76851e57-763c-46af-a3e1-7a0bbf0dbc04">
+          <input type="hidden" name="subject" value="【ポートフォリオ】お問い合わせ">
+          <input type="hidden" name="from_name" value="Portfolio Contact Form">
           <div class="cf-row">
             <div class="cf-field">
               <label class="cf-label" for="cf-name">お名前 <span class="required">*必須</span></label>
@@ -745,7 +747,7 @@
           <div class="cf-field">
             <label class="cf-label" for="cf-email">メールアドレス <span class="required">*必須</span></label>
             <input class="cf-input" id="cf-email" name="email" type="email" placeholder="example@email.com" required>
-            <span class="cf-error" id="cf-email-error">有効なメールアドレスを入力してください（例：example@email.com）</span>
+            <span class="cf-error" id="cf-email-error">有効なメールアドレスを入力してください（例：<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c8adb0a9a5b8a4ad88ada5a9a1a4e6aba7a5">[email&#160;protected]</a>）</span>
           </div>
           <div class="cf-row">
             <div class="cf-field">
@@ -828,7 +830,7 @@
     </div>
   </div>
 
-  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
     /* ── HERO CANVAS (starfield — dark, enhanced) ── */
     (function () {
       const wrap   = document.getElementById('heroWrap');
@@ -1383,13 +1385,13 @@
       btn.textContent = '送信中…';
       const formData = new FormData(e.target);
       try {
-        const res = await fetch('https://formspree.io/f/76851e57-763c-46af-a3e1-7a0bbf0dbc04', {
+        const res = await fetch('https://api.web3forms.com/submit', {
           method: 'POST',
           body: formData,
           headers: { 'Accept': 'application/json' },
         });
         const data = await res.json();
-        if (res.ok) {
+        if (data.success) {
           document.getElementById('cfForm').style.display = 'none';
           document.getElementById('cfSuccess').style.display = 'block';
         } else {
@@ -1722,14 +1724,4 @@
     const skillObs = new IntersectionObserver(entries => {
       entries.forEach(e => {
         if (e.isIntersecting) {
-          e.target.querySelectorAll('.skill-bar').forEach(bar => {
-            bar.style.width = bar.dataset.w + '%';
-          });
-        }
-      });
-    }, { threshold: 0.2 });
-    document.querySelectorAll('#skills').forEach(s => skillObs.observe(s));
-
-  </script>
-</body>
-</html>
+          e.target.querySelectorAll('.skill-bar').forEach
