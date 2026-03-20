@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Portfolio – 松野 貴禎</title>
+  <title>Portfolio – M.T</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:ital,wght@0,300;0,400;1,300&family=Josefin+Sans:wght@100;300;400;600&display=swap" rel="stylesheet" />
@@ -747,7 +747,7 @@
           <div class="cf-field">
             <label class="cf-label" for="cf-email">メールアドレス <span class="required">*必須</span></label>
             <input class="cf-input" id="cf-email" name="email" type="email" placeholder="example@email.com" required>
-            <span class="cf-error" id="cf-email-error">有効なメールアドレスを入力してください（例：example@email.com）</span>
+            <span class="cf-error" id="cf-email-error">有効なメールアドレスを入力してください（例：<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="a5c0ddc4c8d5c9c0e5c0c8c4ccc98bc6cac8">[email&#160;protected]</a>）</span>
           </div>
           <div class="cf-row">
             <div class="cf-field">
@@ -830,7 +830,7 @@
     </div>
   </div>
 
-  <script>
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
     /* ── HERO CANVAS (starfield — dark, enhanced) ── */
     (function () {
       const wrap   = document.getElementById('heroWrap');
@@ -1724,14 +1724,4 @@
     const skillObs = new IntersectionObserver(entries => {
       entries.forEach(e => {
         if (e.isIntersecting) {
-          e.target.querySelectorAll('.skill-bar').forEach(bar => {
-            bar.style.width = bar.dataset.w + '%';
-          });
-        }
-      });
-    }, { threshold: 0.2 });
-    document.querySelectorAll('#skills').forEach(s => skillObs.observe(s));
-
-  </script>
-</body>
-</html>
+          e.target.querySelectorAll('.skill-bar').forEach
