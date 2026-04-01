@@ -1199,7 +1199,7 @@
         t += 0.014;
 
         // 流れ星
-        if (Math.random() < 0.006) spawnShooter(w, h);
+        if (!isMobile && Math.random() < 0.006) spawnShooter(w, h);
         shooters = shooters.filter(s => s.life > 0);
         shooters.forEach(s => {
           const ex = s.x + Math.cos(s.angle) * s.len;
