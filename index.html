@@ -74,6 +74,7 @@
     /* HERO */
     .hero-wrap { position: relative; width: 100%; overflow: hidden; border-bottom: 0.5px solid var(--border); }
     .hero-canvas-wrap { width: 100%; height: 35vh; min-height: 120px; position: relative; cursor: none; }
+    @media (max-width: 600px) { .hero-canvas-wrap { height: 18vh; min-height: 80px; } }
     canvas#heroCanvas { position: absolute; inset: 0; width: 100%; height: 100%; }
     .hero-label {
       position: absolute;
@@ -899,7 +900,9 @@
       let celestialSeq = 0;
       const CELESTIAL_ORDER = ['earth','moon','ufo'];
 
+      const isMobile = window.innerWidth <= 600;
       function spawnCelestial(w, h) {
+        if (isMobile) return;
         const type = CELESTIAL_ORDER[celestialSeq % CELESTIAL_ORDER.length];
         celestialSeq++;
         const isEarth = type === 'earth';
