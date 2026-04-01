@@ -440,6 +440,21 @@
       <span class="section-title">Works</span>
     </div>
     <div class="works-grid">
+      <!-- 植物診断＆ケアアドバイス（実装済み・Vercelデプロイ済み） -->
+      <div class="work-item" data-url="https://plant-see-app.vercel.app" data-title="植物診断＆ケアアドバイスアプリ">
+        <canvas class="work-canvas" id="wc_plant" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
+        <div class="work-overlay">
+          <div class="work-tag">AI × Web</div>
+          <div class="work-title">植物診断＆ケアアドバイス</div>
+          <div class="work-techs">
+            <span class="work-tech">Next.js</span>
+            <span class="work-tech">Gemini API</span>
+            <span class="work-tech">Supabase</span>
+            <span class="work-tech">Vercel</span>
+          </div>
+          <div class="work-open-hint">デモを見る ↗</div>
+        </div>
+      </div>
 
       <!-- 1: 在庫・発注管理 (span 2) -->
       <div class="work-item" data-url="works/inventory.html" data-title="在庫・発注管理 Web アプリ">
@@ -481,22 +496,6 @@
             <span class="work-tech">CNN</span>
             <span class="work-tech">VGG16</span>
             <span class="work-tech">Django</span>
-          </div>
-          <div class="work-open-hint">準備中</div>
-        </div>
-      </div>
-
-      <!-- 4: 植物診断 -->
-      <div class="work-item" data-url="works/plant-care.html" data-title="植物診断＆ケアアドバイスアプリ">
-        <canvas class="work-canvas" id="wc4" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
-        <div class="work-overlay">
-          <div class="work-tag">AI × Web</div>
-          <div class="work-title">植物診断＆ケアアドバイス</div>
-          <div class="work-techs">
-            <span class="work-tech">VGG16</span>
-            <span class="work-tech">BERT</span>
-            <span class="work-tech">Django</span>
-            <span class="work-tech">Slack</span>
           </div>
           <div class="work-open-hint">準備中</div>
         </div>
@@ -1718,6 +1717,85 @@
       ctx.fillRect(ox+cw3*2, oy+rh*2, cw3, rh*4);
       ctx.strokeStyle='rgba(40,160,80,0.4)'; ctx.lineWidth=0.5;
       ctx.strokeRect(ox+cw3*2, oy+rh*2, cw3, rh*4);
+    });
+
+    
+    // plant: 植物診断 — 緑系グラデ＋葉のシルエット
+    drawWorkCanvas('wc_plant', (ctx, w, h) => {
+      const grd = ctx.createLinearGradient(0, 0, w, h);
+      grd.addColorStop(0, '#1D3A2A');
+      grd.addColorStop(0.5, '#1D6A4A');
+      grd.addColorStop(1, '#2D9E6A');
+      ctx.fillStyle = grd;
+      ctx.fillRect(0, 0, w, h);
+
+      // 背景の丸い光
+      const glow = ctx.createRadialGradient(w*0.5, h*0.4, 0, w*0.5, h*0.4, w*0.45);
+      glow.addColorStop(0, 'rgba(100,220,150,0.18)');
+      glow.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = glow; ctx.fillRect(0,0,w,h);
+
+      // 葉のシルエット（左下）
+      ctx.save();
+      ctx.translate(w*0.15, h*0.85);
+      ctx.rotate(-0.4);
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.bezierCurveTo(-w*0.08, -h*0.25, w*0.12, -h*0.38, w*0.18, -h*0.18);
+      ctx.bezierCurveTo(w*0.22, -h*0.08, w*0.06, h*0.04, 0, 0);
+      ctx.fillStyle = 'rgba(60,180,100,0.35)'; ctx.fill();
+      ctx.restore();
+
+      // 葉のシルエット（右上）
+      ctx.save();
+      ctx.translate(w*0.82, h*0.22);
+      ctx.rotate(0.6);
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.bezierCurveTo(-w*0.06, -h*0.2, w*0.1, -h*0.3, w*0.14, -h*0.14);
+      ctx.bezierCurveTo(w*0.16, -h*0.06, w*0.04, h*0.03, 0, 0);
+      ctx.fillStyle = 'rgba(60,200,110,0.25)'; ctx.fill();
+      ctx.restore();
+
+      // 中央: 診断カードのモック
+      const cx = w*0.5, cy = h*0.5;
+      const cw2 = w*0.62, ch2 = h*0.54;
+      ctx.fillStyle = 'rgba(255,255,255,0.12)';
+      ctx.beginPath();
+      ctx.roundRect(cx-cw2/2, cy-ch2/2, cw2, ch2, 8);
+      ctx.fill();
+
+      // カード内テキスト行
+      ctx.fillStyle = 'rgba(255,255,255,0.9)';
+      ctx.fillRect(cx-cw2*0.35, cy-ch2*0.3, cw2*0.55, 5);
+      ctx.fillStyle = 'rgba(255,255,255,0.45)';
+      ctx.fillRect(cx-cw2*0.35, cy-ch2*0.14, cw2*0.38, 3.5);
+      ctx.fillRect(cx-cw2*0.35, cy-ch2*0.02, cw2*0.42, 3.5);
+      ctx.fillRect(cx-cw2*0.35, cy+ch2*0.1, cw2*0.3, 3.5);
+
+      // 信頼度バッジ
+      ctx.fillStyle = 'rgba(100,220,150,0.35)';
+      ctx.beginPath();
+      ctx.roundRect(cx+cw2*0.14, cy-ch2*0.32, cw2*0.2, 14, 4);
+      ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,0.85)';
+      ctx.font = '600 8px monospace';
+      ctx.fillText('98%', cx+cw2*0.17, cy-ch2*0.22);
+
+      // 下部: Amazon / PDFボタン風
+      ctx.fillStyle = 'rgba(255,200,60,0.25)';
+      ctx.fillRect(cx-cw2*0.35, cy+ch2*0.25, cw2*0.3, 10);
+      ctx.fillStyle = 'rgba(255,255,255,0.15)';
+      ctx.fillRect(cx, cy+ch2*0.25, cw2*0.3, 10);
+
+      // "LIVE" バッジ
+      ctx.fillStyle = 'rgba(80,220,120,0.9)';
+      ctx.beginPath();
+      ctx.roundRect(w*0.06, h*0.07, 36, 14, 4);
+      ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.font = '700 7px monospace';
+      ctx.fillText('LIVE', w*0.1, h*0.07+10);
     });
 
     /* ── SKILL BARS ── */
