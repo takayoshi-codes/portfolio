@@ -941,7 +941,7 @@
       // 15秒ごとに登場（最初は5秒後）・重複起動防止
       let celestialTimerStarted = false;
       setTimeout(() => {
-        if (celestialTimerStarted) return;
+        if (celestialTimerStarted || isMobile) return;
         celestialTimerStarted = true;
         const r = wrap.getBoundingClientRect();
         spawnCelestial(r.width, r.height);
