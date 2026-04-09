@@ -566,22 +566,7 @@
         </div>
       </div>
 
-      <!-- 7: 求人マッチング -->
-      <div class="work-item" data-url="https://job-matcher-front.vercel.app/career" data-title="Career Builder — 職務経歴書・スキルシート作成ツール">
-        <canvas class="work-canvas" id="wc7" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
-        <div class="work-overlay">
-          <div class="work-tag">NLP</div>
-          <div class="work-title">求人票×職務経歴書 マッチング診断</div>
-          <div class="work-techs">
-            <span class="work-tech">Word2Vec</span>
-            <span class="work-tech">BERT</span>
-            <span class="work-tech">Streamlit</span>
-          </div>
-          <div class="work-open-hint">🚧 作成中</div>
-        </div>
-      </div>
-
-      <!-- 8: 競合価格Bot -->
+      <!-- 7: 競合価格Bot -->
       <div class="work-item" data-url="works/price-monitor.html" data-title="競合価格モニタリング＆通知Bot">
         <canvas class="work-canvas" id="wc8" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
         <div class="work-overlay">
@@ -597,7 +582,7 @@
         </div>
       </div>
 
-      <!-- 9: 週次レポート -->
+      <!-- 8: 週次レポート -->
       <div class="work-item" data-url="works/report-generator.html" data-title="週次レポート自動生成ツール">
         <canvas class="work-canvas" id="wc9" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
         <div class="work-overlay">
@@ -1693,26 +1678,7 @@
       });
     });
 
-    // 7: 求人マッチング — スコアゲージ
-    drawWorkCanvas('wc7', (ctx, w, h) => {
-      ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,w,h);
-      const cx=w/2, cy=h*0.5, radius=Math.min(w,h)*0.3;
-      ctx.beginPath(); ctx.arc(cx,cy,radius,Math.PI,2*Math.PI);
-      ctx.strokeStyle='rgba(28,28,26,0.1)'; ctx.lineWidth=8; ctx.stroke();
-      ctx.beginPath(); ctx.arc(cx,cy,radius,Math.PI,Math.PI+Math.PI*0.76);
-      ctx.strokeStyle='rgba(28,28,26,0.7)'; ctx.lineWidth=8;
-      ctx.lineCap='round'; ctx.stroke();
-      ctx.fillStyle='rgba(28,28,26,0.8)'; ctx.font='700 18px monospace';
-      ctx.textAlign='center'; ctx.fillText('76%', cx, cy+6);
-      ctx.fillStyle='rgba(28,28,26,0.35)'; ctx.font='500 7px monospace';
-      ctx.fillText('MATCH SCORE', cx, cy+18); ctx.textAlign='start';
-      [0.52,0.38,0.66].forEach((lw,i)=>{
-        ctx.fillStyle='rgba(28,28,26,0.08)';
-        ctx.fillRect(w*0.1, h*0.78+i*10, w*lw, 5);
-      });
-    });
-
-    // 8: 競合価格Bot — 折れ線＋通知バッジ
+    // 7: 競合価格Bot — 折れ線＋通知バッジ
     drawWorkCanvas('wc8', (ctx, w, h) => {
       ctx.fillStyle = '#f0ede6'; ctx.fillRect(0,0,w,h);
       const data=[0.5,0.48,0.52,0.47,0.6,0.55,0.58,0.72,0.65,0.7];
@@ -1733,7 +1699,7 @@
       ctx.fillText('⚡ PRICE ALERT', w*0.62, h*0.08+14);
     });
 
-    // 9: 週次レポート — Excelグリッド風
+    // 8: 週次レポート — Excelグリッド風
     drawWorkCanvas('wc9', (ctx, w, h) => {
       ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,w,h);
       const cols=5, rows2=6, cw3=w*0.84/cols, rh=h*0.78/rows2;
@@ -1756,6 +1722,36 @@
     });
 
     
+    // wc7: Career Builder — ステップバー
+    drawWorkCanvas('wc7', (ctx, w, h) => {
+      ctx.fillStyle = '#fff8f5'; ctx.fillRect(0,0,w,h);
+      const steps = 7; const sw = w*0.7/steps; const sx = w*0.15;
+      for(let i=0;i<steps;i++){
+        ctx.beginPath();
+        ctx.arc(sx+i*sw, h*0.38, 7, 0, Math.PI*2);
+        ctx.fillStyle = i<4 ? 'rgba(232,93,38,0.85)' : 'rgba(28,28,26,0.1)';
+        ctx.fill();
+        if(i<steps-1){
+          ctx.beginPath(); ctx.moveTo(sx+i*sw+8,h*0.38); ctx.lineTo(sx+(i+1)*sw-8,h*0.38);
+          ctx.strokeStyle = i<3 ? 'rgba(232,93,38,0.5)' : 'rgba(28,28,26,0.1)';
+          ctx.lineWidth=2; ctx.stroke();
+        }
+      }
+      ctx.fillStyle='rgba(232,93,38,0.9)'; ctx.font='700 11px monospace';
+      ctx.textAlign='center'; ctx.fillText('CAREER', w/2, h*0.56);
+      ctx.fillStyle='rgba(28,28,26,0.4)'; ctx.font='500 8px monospace';
+      ctx.fillText('BUILDER', w/2, h*0.67);
+      [0.75,0.83,0.91].forEach((y,i)=>{
+        ctx.fillStyle='rgba(28,28,26,0.07)';
+        ctx.fillRect(w*0.12, h*y, w*[0.6,0.45,0.5][i], 4);
+      });
+      ctx.fillStyle='rgba(232,93,38,0.9)';
+      ctx.beginPath(); ctx.roundRect(w*0.06,h*0.07,52,14,4); ctx.fill();
+      ctx.fillStyle='#fff'; ctx.font='700 7px monospace';
+      ctx.fillText('Career Tool', w*0.09, h*0.07+10);
+      ctx.textAlign='start';
+    });
+
     // plant: 植物診断 — 緑系グラデ＋葉のシルエット
     drawWorkCanvas('wc_plant', (ctx, w, h) => {
       const grd = ctx.createLinearGradient(0, 0, w, h);
@@ -1891,6 +1887,7 @@
   </script>
 </body>
 </html>
+
 
 
 
