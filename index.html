@@ -474,7 +474,7 @@
           <div class="work-open-hint">デモを見る ↗</div>
         </div>
       </div>
-      <!-- 2: Career Builder -->
+      <!-- Career Builder -->
       <div class="work-item" data-url="https://job-matcher-front.vercel.app/" data-title="Career Builder — 職務経歴書・スキルシート作成ツール">
         <canvas class="work-canvas" id="wc7" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
         <div class="work-overlay">
@@ -488,6 +488,22 @@
             <span class="work-tech">Vercel</span>
           </div>
           <div class="work-open-hint">デモを見る ↗</div>
+        </div>
+      </div>
+      <!-- 保育園 月次レポート自動化 -->
+      <div class="work-item" data-url="https://github.com/takayoshi-codes/nursery-auto-gas" data-title="保育園 月次レポート自動化">
+        <canvas class="work-canvas" id="wc_nursery" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
+        <div class="work-overlay">
+          <div class="work-tag">Business Automation</div>
+          <div class="work-title">保育園 月次レポート自動化</div>
+          <div class="work-desc">出勤データを起点にDB連携・集計・PDF自動生成・Drive保存・Slack通知までを一気通貫で自動化。毎月1日に完全自動実行。</div>
+          <div class="work-techs">
+            <span class="work-tech">Google Apps Script</span>
+            <span class="work-tech">Neon (PostgreSQL)</span>
+            <span class="work-tech">Slack Webhook</span>
+            <span class="work-tech">Google Drive</span>
+          </div>
+          <div class="work-open-hint">Code ↗</div>
         </div>
       </div>
       <!-- 1: 在庫・発注管理 (span 2) -->
@@ -1720,7 +1736,43 @@
       ctx.strokeStyle='rgba(40,160,80,0.4)'; ctx.lineWidth=0.5;
       ctx.strokeRect(ox+cw3*2, oy+rh*2, cw3, rh*4);
     });
+    // nursery: 保育園自動化 — フロー図風
+    drawWorkCanvas('wc_nursery', (ctx, w, h) => {
+      ctx.fillStyle = '#0d1f16'; ctx.fillRect(0,0,w,h);
+      const grd = ctx.createRadialGradient(w*0.5,h*0.4,0,w*0.5,h*0.4,w*0.5);
+      grd.addColorStop(0,'rgba(29,158,117,0.2)'); grd.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=grd; ctx.fillRect(0,0,w,h);
 
+      const nodes = [
+        {x:w*0.5, y:h*0.12, label:'Spreadsheet', color:'rgba(29,158,117,0.9)'},
+        {x:w*0.5, y:h*0.32, label:'GAS', color:'rgba(127,119,221,0.9)'},
+        {x:w*0.22,y:h*0.54, label:'Neon DB', color:'rgba(56,138,221,0.9)'},
+        {x:w*0.78,y:h*0.54, label:'Drive PDF', color:'rgba(186,117,23,0.9)'},
+        {x:w*0.5, y:h*0.78, label:'Slack', color:'rgba(29,158,117,0.9)'},
+      ];
+      const edges = [[0,1],[1,2],[1,3],[2,4],[3,4]];
+
+      edges.forEach(([a,b])=>{
+        ctx.beginPath();
+        ctx.moveTo(nodes[a].x, nodes[a].y);
+        ctx.lineTo(nodes[b].x, nodes[b].y);
+        ctx.strokeStyle='rgba(255,255,255,0.12)';
+        ctx.lineWidth=1; ctx.stroke();
+      });
+
+      nodes.forEach(n => {
+        ctx.beginPath(); ctx.arc(n.x, n.y, 18, 0, Math.PI*2);
+        ctx.fillStyle=n.color; ctx.fill();
+        ctx.font='bold 7px monospace';
+        ctx.fillStyle='#fff'; ctx.textAlign='center';
+        ctx.fillText(n.label, n.x, n.y+3);
+      });
+
+      ctx.fillStyle='rgba(29,158,117,0.85)';
+      ctx.beginPath(); ctx.roundRect(w*0.06,h*0.06,52,14,4); ctx.fill();
+      ctx.fillStyle='#fff'; ctx.font='700 7px monospace';
+      ctx.textAlign='left'; ctx.fillText('GAS AUTO', w*0.09, h*0.06+10);
+    });
     
     // wc7: Career Builder — ステップバー
     drawWorkCanvas('wc7', (ctx, w, h) => {
