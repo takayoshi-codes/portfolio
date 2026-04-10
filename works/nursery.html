@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>保育園 月次レポート自動化</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#f8f7f4;--text:#1c1c1a;--muted:#888780;--border:rgba(0,0,0,0.08);--teal:#1D9E75;--teal-light:#E1F5EE}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.7}
+.wrap{max-width:820px;margin:0 auto;padding:2.5rem 1.5rem}
+.badge{display:inline-block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;background:var(--teal-light);color:var(--teal);padding:3px 10px;border-radius:2px;margin-bottom:1rem}
+h1{font-size:1.6rem;font-weight:700;letter-spacing:-.5px;margin-bottom:.5rem}
+.sub{color:var(--muted);font-size:13px;margin-bottom:2rem}
+.divider{height:.5px;background:var(--border);margin:2rem 0}
+h2{font-size:.9rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem}
+.kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:2rem}
+.kpi{background:#fff;border:.5px solid var(--border);padding:1rem 1.2rem;border-radius:4px}
+.kpi-val{font-size:1.5rem;font-weight:700;color:var(--teal)}
+.kpi-lbl{font-size:11px;color:var(--muted);margin-top:2px}
+.flow{display:flex;flex-direction:column;align-items:center;gap:0;margin-bottom:2rem}
+.flow-node{background:#fff;border:.5px solid var(--border);border-radius:6px;padding:10px 20px;font-size:13px;font-weight:500;width:260px;text-align:center;position:relative}
+.flow-node.teal{background:var(--teal-light);border-color:var(--teal);color:#085041}
+.flow-node.purple{background:#EEEDFE;border-color:#534AB7;color:#3C3489}
+.flow-node.blue{background:#E6F1FB;border-color:#185FA5;color:#0C447C}
+.flow-node.amber{background:#FAEEDA;border-color:#854F0B;color:#633806}
+.flow-node.coral{background:#FAECE7;border-color:#993C1D;color:#712B13}
+.flow-arrow{font-size:16px;color:var(--muted);line-height:1.2}
+.flow-fork{display:flex;gap:16px;align-items:flex-start}
+.flow-fork-node{background:#fff;border:.5px solid var(--border);border-radius:6px;padding:10px 16px;font-size:12px;font-weight:500;width:150px;text-align:center}
+.flow-fork-node.teal{background:var(--teal-light);border-color:var(--teal);color:#085041}
+.flow-fork-node.blue{background:#E6F1FB;border-color:#185FA5;color:#0C447C}
+.tech-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:2rem}
+.tech{font-size:11px;background:#fff;border:.5px solid var(--border);padding:4px 12px;border-radius:100px;color:var(--muted)}
+.feature-list{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:2rem}
+.feature{background:#fff;border:.5px solid var(--border);border-radius:4px;padding:10px 14px;font-size:12px}
+.feature-icon{color:var(--teal);font-weight:700;margin-right:4px}
+.links{display:flex;gap:12px;flex-wrap:wrap}
+.link-btn{display:inline-block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:10px 22px;border-radius:2px;text-decoration:none;transition:opacity .2s}
+.link-btn.primary{background:var(--teal);color:#fff}
+.link-btn.secondary{background:#fff;border:.5px solid var(--border);color:var(--text)}
+.link-btn:hover{opacity:.75}
+@media(max-width:600px){.kpi-row{grid-template-columns:1fr 1fr}.feature-list{grid-template-columns:1fr}.flow-fork{flex-direction:column;align-items:center}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="badge">Business Automation</div>
+  <h1>保育園 月次レポート自動化</h1>
+  <p class="sub">Google Apps Script × Neon(PostgreSQL) × Google Drive × Slack — 実際に動作確認済み</p>
+
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-val">5</div><div class="kpi-lbl">連携システム数</div></div>
+    <div class="kpi"><div class="kpi-val">0分</div><div class="kpi-lbl">月次レポート作成時間</div></div>
+    <div class="kpi"><div class="kpi-val">毎月1日</div><div class="kpi-lbl">自動実行タイミング</div></div>
+  </div>
+
+  <div class="divider"></div>
+  <h2>自動化フロー</h2>
+
+  <div class="flow">
+    <div class="flow-node teal">Google スプレッドシート<br><small style="font-weight:400;font-size:11px">出勤データ入力</small></div>
+    <div class="flow-arrow">↓ 毎月1日 06:00 自動起動</div>
+    <div class="flow-node purple">GAS — runMonthlyReport()<br><small style="font-weight:400;font-size:11px">エントリーポイント</small></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-fork">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+        <div class="flow-fork-node teal">出勤データ取得<br><small>Sheets → フィルタ</small></div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+        <div class="flow-fork-node blue">園児データ取得<br><small>Neon REST API</small></div>
+      </div>
+    </div>
+    <div class="flow-arrow">↓ 結合・集計</div>
+    <div class="flow-node amber">PDF生成 → Google Drive保存<br><small style="font-weight:400;font-size:11px">HtmlService → DriveApp</small></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-node coral">Zapier / Slack Webhook 通知<br><small style="font-weight:400;font-size:11px">完了通知 + DriveリンクURL</small></div>
+  </div>
+
+  <div class="divider"></div>
+  <h2>使用技術</h2>
+  <div class="tech-row">
+    <span class="tech">Google Apps Script</span>
+    <span class="tech">Neon (PostgreSQL互換)</span>
+    <span class="tech">Neon REST API</span>
+    <span class="tech">Google Drive API</span>
+    <span class="tech">Slack Incoming Webhook</span>
+    <span class="tech">Gmail API</span>
+    <span class="tech">JavaScript</span>
+  </div>
+
+  <div class="divider"></div>
+  <h2>実装した機能</h2>
+  <div class="feature-list">
+    <div class="feature"><span class="feature-icon">✓</span>スプレッドシートから当月出勤データを自動取得</div>
+    <div class="feature"><span class="feature-icon">✓</span>クラウドDB（Neon）から園児マスタをAPI経由で取得・結合</div>
+    <div class="feature"><span class="feature-icon">✓</span>保育士別勤務時間・クラス別在籍数を集計</div>
+    <div class="feature"><span class="feature-icon">✓</span>月次レポートをPDF生成してGoogle Driveに自動保存</div>
+    <div class="feature"><span class="feature-icon">✓</span>Slackに完了通知（DriveリンクURL付き）</div>
+    <div class="feature"><span class="feature-icon">✓</span>エラー時はGmailで管理者に自動通知</div>
+    <div class="feature"><span class="feature-icon">✓</span>毎月1日06:00のtime-basedトリガーで完全自動実行</div>
+    <div class="feature"><span class="feature-icon">✓</span>設定値はスプレッドシート管理（APIキー等をコードに埋め込まない）</div>
+  </div>
+
+  <div class="divider"></div>
+  <div class="links">
+    <a class="link-btn primary" href="https://github.com/takayoshi-codes/nursery-auto-gas" target="_blank">Code ↗</a>
+    <a class="link-btn secondary" href="https://portfolio-five-beryl-67.vercel.app/#works" target="_blank">← Works に戻る</a>
+  </div>
+
+</div>
+</body>
+</html>
