@@ -613,6 +613,22 @@
         </div>
       </div>
 
+      <!-- 保険診断 AI アプリ -->
+      <div class="work-item" data-url="works/insurance-advisor.html" data-title="保険診断 AI アプリ">
+        <canvas class="work-canvas" id="wc_insurance" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
+        <div class="work-overlay">
+          <div class="work-tag">AI × FinTech</div>
+          <div class="work-title">保険診断 AI アプリ</div>
+          <div class="work-desc">年齢・家族構成・年収などのプロフィールを入力するだけで、AIが最適な保険の種類と保険会社を診断・提案。FP の知見をもとにした独自ロジックで、保険選びのミスマッチを防ぎます。</div>
+          <div class="work-techs">
+            <span class="work-tech">Next.js</span>
+            <span class="work-tech">Gemini API</span>
+            <span class="work-tech">Vercel</span>
+          </div>
+          <div class="work-open-hint">🚧 作成中</div>
+        </div>
+      </div>
+      
     </div>
   </section>
 
@@ -1926,6 +1942,78 @@
       ctx.fillStyle='#fff'; ctx.font='700 7px monospace'; ctx.fillText('LIVE',w*0.1,h*0.06+10);
     });
 
+    // wc_insurance: 保険診断AI — ダーク金融テーマ
+    drawWorkCanvas('wc_insurance', (ctx, w, h) => {
+      ctx.fillStyle = '#0a0f1e'; ctx.fillRect(0,0,w,h);
+
+      // 背景グロー
+      const grd = ctx.createRadialGradient(w*0.5,h*0.45,0,w*0.5,h*0.45,w*0.55);
+      grd.addColorStop(0,'rgba(99,179,237,0.14)');
+      grd.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=grd; ctx.fillRect(0,0,w,h);
+
+      // 診断カード本体
+      const cx=w*0.5, cy=h*0.5;
+      const cw2=w*0.68, ch2=h*0.58;
+      ctx.fillStyle='rgba(255,255,255,0.06)';
+      ctx.beginPath(); ctx.roundRect(cx-cw2/2, cy-ch2/2, cw2, ch2, 7); ctx.fill();
+      ctx.strokeStyle='rgba(99,179,237,0.2)'; ctx.lineWidth=0.5;
+      ctx.beginPath(); ctx.roundRect(cx-cw2/2, cy-ch2/2, cw2, ch2, 7); ctx.stroke();
+
+      // 項目ラベル＋バー（年齢・年収・家族）
+      const items=[
+        {label:'年齢', pct:0.72, color:'rgba(99,179,237,0.8)'},
+        {label:'年収', pct:0.55, color:'rgba(154,117,221,0.8)'},
+        {label:'家族', pct:0.88, color:'rgba(99,179,237,0.6)'},
+      ];
+      items.forEach((item, i) => {
+        const y = cy - ch2*0.18 + i * (h*0.15);
+        // ラベル
+        ctx.fillStyle='rgba(200,220,255,0.5)';
+        ctx.fillRect(cx-cw2*0.38, y, 18, 4);
+        // バー背景
+        ctx.fillStyle='rgba(255,255,255,0.06)';
+        ctx.fillRect(cx-cw2*0.38, y+8, cw2*0.7, 5);
+        // バー本体
+        ctx.fillStyle=item.color;
+        ctx.fillRect(cx-cw2*0.38, y+8, cw2*0.7*item.pct, 5);
+        // 端点ドット
+        ctx.beginPath();
+        ctx.arc(cx-cw2*0.38 + cw2*0.7*item.pct, y+10.5, 3, 0, Math.PI*2);
+        ctx.fillStyle=item.color; ctx.fill();
+      });
+
+      // 結果バッジ
+      const bgrd = ctx.createLinearGradient(cx-cw2*0.22, 0, cx+cw2*0.22, 0);
+      bgrd.addColorStop(0,'rgba(99,179,237,0.35)');
+      bgrd.addColorStop(1,'rgba(154,117,221,0.35)');
+      ctx.fillStyle=bgrd;
+      ctx.beginPath(); ctx.roundRect(cx-cw2*0.22, cy+ch2*0.22, cw2*0.44, 14, 5); ctx.fill();
+      ctx.strokeStyle='rgba(99,179,237,0.4)'; ctx.lineWidth=0.5;
+      ctx.beginPath(); ctx.roundRect(cx-cw2*0.22, cy+ch2*0.22, cw2*0.44, 14, 5); ctx.stroke();
+      ctx.fillStyle='rgba(210,230,255,0.85)';
+      ctx.font='600 7px monospace'; ctx.textAlign='center';
+      ctx.fillText('BEST MATCH: 終身保険', cx, cy+ch2*0.22+9.5);
+
+      // タイトルテキスト行
+      ctx.fillStyle='rgba(255,255,255,0.8)';
+      ctx.fillRect(cx-cw2*0.38, cy-ch2*0.38, cw2*0.5, 6);
+      ctx.fillStyle='rgba(255,255,255,0.2)';
+      ctx.fillRect(cx-cw2*0.38, cy-ch2*0.3, cw2*0.32, 4);
+
+      // FPバッジ
+      ctx.fillStyle='rgba(99,179,237,0.9)';
+      ctx.beginPath(); ctx.roundRect(w*0.06, h*0.07, 40, 14, 4); ctx.fill();
+      ctx.fillStyle='#fff'; ctx.font='700 7px monospace';
+      ctx.textAlign='left'; ctx.fillText('FP知見', w*0.09, h*0.07+10);
+
+      // 🚧バッジ
+      ctx.fillStyle='rgba(255,255,255,0.08)';
+      ctx.beginPath(); ctx.roundRect(w*0.72, h*0.07, 52, 14, 4); ctx.fill();
+      ctx.fillStyle='rgba(255,255,255,0.45)'; ctx.font='600 7px monospace';
+      ctx.fillText('COMING SOON', w*0.735, h*0.07+10);
+    });
+    
     /* ── SKILL BARS ── */
     const skillObs = new IntersectionObserver(entries => {
       entries.forEach(e => {
